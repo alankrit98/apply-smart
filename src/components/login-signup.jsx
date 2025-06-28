@@ -1,0 +1,388 @@
+import React, { useState } from "react";
+
+const LoginSignup = () => {
+  const [isLogin, setIsLogin] = useState(true);
+
+  const toggleForm = () => {
+    setIsLogin(!isLogin);
+  };
+
+  const handleLogin = (e) => {
+    e.preventDefault();
+    console.log("Login submitted");
+  };
+
+  const handleSignup = (e) => {
+    e.preventDefault();
+    console.log("Signup submitted");
+  };
+
+  return (
+    <div className="auth-container">
+      <div className="auth-wrapper">
+        <div className="animated-border">
+          <div className="form-container">
+            {isLogin ? (
+              <div id="loginForm" className="auth-form">
+                <div className="form-header">
+                  <h2>Welcome Back</h2>
+                  <p>Sign in to your account</p>
+                </div>
+                
+                <div className="form-group">
+                  <label htmlFor="loginEmail">Email</label>
+                  <input
+                    type="email"
+                    id="loginEmail"
+                    placeholder="Enter your email"
+                    required
+                  />
+                </div>
+                
+                <div className="form-group">
+                  <label htmlFor="loginPassword">Password</label>
+                  <input
+                    type="password"
+                    id="loginPassword"
+                    placeholder="Enter your password"
+                    required
+                  />
+                </div>
+                
+                <button type="submit" className="btn primary-btn" onClick={handleLogin}>
+                  <span>Login</span>
+                  <div className="btn-glow"></div>
+                </button>
+                
+                <p className="account">
+                  Don't have an account?
+                  <button
+                    type="button"
+                    className="toggle-link"
+                    onClick={toggleForm}
+                  >
+                    Sign Up
+                  </button>
+                </p>
+              </div>
+            ) : (
+              <div id="signupForm" className="auth-form">
+                <div className="form-header">
+                  <h2>Create Account</h2>
+                  <p>Join us today</p>
+                </div>
+                
+                <div className="form-group">
+                  <label htmlFor="signupName">Name</label>
+                  <input
+                    type="text"
+                    id="signupName"
+                    placeholder="Enter your name"
+                    required
+                  />
+                </div>
+                
+                <div className="form-group">
+                  <label htmlFor="signupEmail">Email</label>
+                  <input
+                    type="email"
+                    id="signupEmail"
+                    placeholder="Enter your email"
+                    required
+                  />
+                </div>
+                
+                <div className="form-group">
+                  <label htmlFor="signupPassword">Password</label>
+                  <input
+                    type="password"
+                    id="signupPassword"
+                    placeholder="Create a password"
+                    required
+                  />
+                </div>
+                
+                <button type="submit" className="btn primary-btn" onClick={handleSignup}>
+                  <span>Sign Up</span>
+                  <div className="btn-glow"></div>
+                </button>
+                
+                <p className="account">
+                  Already have an account?
+                  <button
+                    type="button"
+                    className="toggle-link"
+                    onClick={toggleForm}
+                  >
+                    Login
+                  </button>
+                </p>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+
+      <style jsx>{`
+        .auth-container {
+          min-height: 100vh;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          padding: 20px;
+          font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .auth-wrapper {
+          position: relative;
+          width: 100%;
+          max-width: 420px;
+          animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+          0%, 100% { transform: translateY(0px); }
+          50% { transform: translateY(-10px); }
+        }
+
+        .animated-border {
+          position: relative;
+          padding: 3px;
+          border-radius: 20px;
+          background: linear-gradient(45deg, #ff6b6b, #4ecdc4, #45b7d1, #96ceb4, #ffeaa7, #fd79a8);
+          background-size: 400% 400%;
+          animation: gradientShift 4s ease infinite;
+        }
+
+        @keyframes gradientShift {
+          0% { background-position: 0% 50%; }
+          50% { background-position: 100% 50%; }
+          100% { background-position: 0% 50%; }
+        }
+
+        .form-container {
+          background: rgba(255, 255, 255, 0.95);
+          backdrop-filter: blur(10px);
+          border-radius: 17px;
+          padding: 40px 35px;
+          box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+          position: relative;
+          overflow: hidden;
+        }
+
+        .form-container::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+          animation: shimmer 2s infinite;
+          pointer-events: none;
+        }
+
+        @keyframes shimmer {
+          0% { transform: translateX(-100%); }
+          100% { transform: translateX(100%); }
+        }
+
+        .auth-form {
+          animation: slideIn 0.6s ease-out;
+        }
+
+        @keyframes slideIn {
+          from {
+            opacity: 0;
+            transform: translateY(20px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+
+        .form-header {
+          text-align: center;
+          margin-bottom: 30px;
+        }
+
+        .form-header h2 {
+          color: #2c3e50;
+          font-size: 28px;
+          font-weight: 700;
+          margin: 0 0 8px 0;
+          background: linear-gradient(135deg, #667eea, #764ba2);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          background-clip: text;
+        }
+
+        .form-header p {
+          color: #7f8c8d;
+          font-size: 14px;
+          margin: 0;
+        }
+
+        .form-group {
+          margin-bottom: 25px;
+          position: relative;
+        }
+
+        .form-group label {
+          display: block;
+          margin-bottom: 8px;
+          color: #2c3e50;
+          font-weight: 600;
+          font-size: 14px;
+        }
+
+        .form-group input {
+          width: 100%;
+          padding: 15px 20px;
+          border: 2px solid #e8ecf0;
+          border-radius: 12px;
+          font-size: 16px;
+          transition: all 0.3s ease;
+          background: rgba(255, 255, 255, 0.8);
+          box-sizing: border-box;
+        }
+
+        .form-group input:focus {
+          outline: none;
+          border-color: #667eea;
+          box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+          animation: pulse 1.5s infinite;
+          transform: translateY(-2px);
+          background: rgba(255, 255, 255, 1);
+        }
+
+        @keyframes pulse {
+          0% { box-shadow: 0 0 0 0 rgba(102, 126, 234, 0.4); }
+          70% { box-shadow: 0 0 0 10px rgba(102, 126, 234, 0); }
+          100% { box-shadow: 0 0 0 0 rgba(102, 126, 234, 0); }
+        }
+
+        .form-group input::placeholder {
+          color: #a0a0a0;
+          transition: all 0.3s ease;
+        }
+
+        .form-group input:focus::placeholder {
+          opacity: 0.7;
+          transform: translateX(5px);
+        }
+
+        .primary-btn {
+          width: 100%;
+          padding: 16px;
+          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          border: none;
+          border-radius: 12px;
+          color: white;
+          font-size: 16px;
+          font-weight: 600;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          position: relative;
+          overflow: hidden;
+          margin-bottom: 20px;
+        }
+
+        .primary-btn span {
+          position: relative;
+          z-index: 2;
+        }
+
+        .btn-glow {
+          position: absolute;
+          top: 0;
+          left: -100%;
+          width: 100%;
+          height: 100%;
+          background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+          transition: left 0.5s;
+        }
+
+        .primary-btn:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        .primary-btn:hover .btn-glow {
+          left: 100%;
+        }
+
+        .primary-btn:active {
+          transform: translateY(-1px);
+        }
+
+        .account {
+          text-align: center;
+          color: #7f8c8d;
+          font-size: 14px;
+          margin: 0;
+        }
+
+        .toggle-link {
+          background: none;
+          border: none;
+          color: #667eea;
+          font-weight: 600;
+          cursor: pointer;
+          text-decoration: none;
+          margin-left: 5px;
+          transition: all 0.3s ease;
+          position: relative;
+        }
+
+        .toggle-link::after {
+          content: '';
+          position: absolute;
+          width: 0;
+          height: 2px;
+          bottom: -2px;
+          left: 0;
+          background: linear-gradient(135deg, #667eea, #764ba2);
+          transition: width 0.3s ease;
+        }
+
+        .toggle-link:hover {
+          color: #764ba2;
+        }
+
+        .toggle-link:hover::after {
+          width: 100%;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 480px) {
+          .auth-container {
+            padding: 15px;
+          }
+          
+          .form-container {
+            padding: 30px 25px;
+          }
+          
+          .form-header h2 {
+            font-size: 24px;
+          }
+          
+          .form-group input {
+            padding: 12px 16px;
+            font-size: 14px;
+          }
+          
+          .primary-btn {
+            padding: 14px;
+            font-size: 14px;
+          }
+        }
+      `}</style>
+    </div>
+  );
+};
+
+export default LoginSignup;
