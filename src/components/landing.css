@@ -189,7 +189,8 @@ html {
 }
 
 .vidcontainer video {
-  width: 100%;
+  margin-right: 150px;
+  width: 120%;
   height: auto;
   border-radius: var(--border-radius);
   box-shadow: var(--shadow-heavy);
@@ -385,7 +386,7 @@ html {
 }
 
 .how-video {
-  width: 100%;
+  width: 120%;
   max-width: 400px;
   border-radius: var(--border-radius);
   box-shadow: var(--shadow-heavy);
