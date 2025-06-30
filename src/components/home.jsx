@@ -1,10 +1,35 @@
+import jwt_decode from "jwt-decode";
 import React, { useState, useEffect } from 'react';
 import { Briefcase, Users, Star, TrendingUp } from 'lucide-react';
+import axios from 'axios';
 
 import { Bell, User, Search, MapPin, Zap, CheckCircle, AlertCircle, Menu, X } from 'lucide-react';
 
 const ApplySmartHomePage = () => {
-  const [userName] = useState("Himanshu Chaudhary");
+  const [userName, setUserName] = useState("");
+  useEffect(() => {
+    const fetchUserName = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        if (!token) {
+          console.log('No token found');
+          return;
+        }
+
+        const res = await axios.get('http://localhost:5000/api/users/profile', {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        setUserName(res.data.name); // Set the name to state
+      } catch (err) {
+        console.error('Failed to fetch user profile', err);
+      }
+    };
+
+    fetchUserName();
+  }, []);
   const [isProfileComplete] = useState(false);
   const [searchField, setSearchField] = useState("");
   const [location, setLocation] = useState("");
@@ -703,7 +728,7 @@ const ApplySmartHomePage = () => {
           </div>
           <div style={{ flex: 1 }}>
             <p style={{ fontWeight: '600', fontSize: '18px', margin: 0 }}>
-              <span style={{ fontWeight: 'bold' }}>{userName},</span> 
+              <span style={{ fontWeight: 'bold' }}>{userName ? userName : 'loading...'},</span> 
               {!isProfileComplete ? " Complete your profile to apply for jobs" : " Welcome back to ApplySmart"}
             </p>
             {!isProfileComplete && (
