@@ -31,7 +31,7 @@ const LoginSignup = () => {
 
     localStorage.setItem('user', JSON.stringify(userData));
     alert('Signup successful! Please login.');
-    toggleForm(); // Switch to login after signup
+    navigate('/applyform');
   };
 
   const handleLogin = (e) => {
@@ -47,7 +47,7 @@ const LoginSignup = () => {
       localStorage.setItem('isLoggedIn', 'true');
       alert(`Welcome back, ${savedUser.name}!`);
       // Navigate or redirect as needed
-      navigate('/');
+      navigate('/home');
     } else {
       alert('Invalid email or password!');
     }

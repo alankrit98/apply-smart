@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const ApplyForm = () => {
   const [currentStep, setCurrentStep] = useState(1);
@@ -10,6 +11,8 @@ const ApplyForm = () => {
     expectedSalary: '',
     currentSalary: ''
   });
+
+  const navigate = useNavigate();
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -38,6 +41,7 @@ const ApplyForm = () => {
     console.log('Form submitted:', formData);
     // Handle form submission logic here
     alert('Form submitted successfully!');
+    navigate('/login-signup');
   };
 
   const jobTitles = [
