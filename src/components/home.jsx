@@ -131,7 +131,8 @@ const ApplySmartHomePage = () => {
       color: '#dbeafe',
       bgColor: '#eff6ff',
       stats: 'Connect with professionals',
-      features: ['Professional Network', 'Job Recommendations', 'Skill Endorsements']
+      features: ['Professional Network', 'Job Recommendations', 'Skill Endorsements'],
+      url: 'https://www.linkedin.com'
     },
     {
       name: 'Glassdoor',
