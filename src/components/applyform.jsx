@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios'; // Import axios for making HTTP requests
 
 const ApplyForm = () => {
   const [currentStep, setCurrentStep] = useState(1);
@@ -11,6 +12,7 @@ const ApplyForm = () => {
     expectedSalary: '',
     currentSalary: ''
   });
+  const [message, setMessage] = useState(''); // State for displaying messages to the user
 
   const navigate = useNavigate();
 
@@ -30,6 +32,12 @@ const ApplyForm = () => {
   };
 
   const showStep2 = () => {
+    // Basic validation for Step 1 before proceeding
+    if (!formData.name || !formData.jobTitle || !formData.location) {
+      setMessage('Please fill in all fields for Step 1.');
+      return;
+    }
+    setMessage(''); // Clear message if validation passes
     setCurrentStep(2);
   };
 
@@ -37,11 +45,40 @@ const ApplyForm = () => {
     setCurrentStep(1);
   };
 
-  const handleSubmit = () => {
-    console.log('Form submitted:', formData);
-    // Handle form submission logic here
-    alert('Form submitted successfully!');
-    navigate('/login-signup');
+  const handleSubmit = async (e) => {
+    e.preventDefault(); // Prevent default form submission behavior
+
+    // Basic validation for Step 2 before submitting
+    if (!formData.experience || !formData.expectedSalary || !formData.currentSalary) {
+      setMessage('Please select all options for Step 2.');
+      return;
+    }
+
+    setMessage('Submitting application...'); // Provide feedback to the user
+    try {
+      // Send the formData to your new backend API endpoint
+      const response = await axios.post('http://localhost:5000/api/applications/submit', formData);
+
+      if (response.status === 201) {
+        setMessage('Application submitted successfully!');
+        console.log('Form submitted:', response.data);
+        // Optionally clear the form after successful submission
+        setFormData({
+          name: '',
+          jobTitle: '',
+          location: '',
+          experience: '',
+          expectedSalary: '',
+          currentSalary: ''
+        });
+        setCurrentStep(1); // Go back to the first step or a confirmation page
+        navigate('/login-signup'); // Navigate to login/signup after successful submission
+      }
+    } catch (error) {
+      console.error('Error submitting application:', error);
+      // Display a user-friendly error message
+      setMessage(error.response?.data?.message || 'Failed to submit application. Please try again.');
+    }
   };
 
   const jobTitles = [
@@ -62,7 +99,7 @@ const ApplyForm = () => {
   ];
 
   const OptionButton = ({ children, field, value, isSelected, onClick }) => (
-    <div 
+    <div
       className={`option ${isSelected ? 'selected' : ''}`}
       onClick={() => onClick(field, value)}
     >
@@ -78,30 +115,34 @@ const ApplyForm = () => {
       </div>
 
       <div className="container fade-in">
+        {/* Message display area */}
+        {message && <div className="form-message">{message}</div>}
+
         {/* Step 1 */}
         {currentStep === 1 && (
           <div id="step1">
             <h2>Step 1: Basic Information</h2>
             <div className="form-group">
               <label htmlFor="name">Your Name</label>
-              <input 
-                type="text" 
-                id="name" 
+              <input
+                type="text"
+                id="name"
                 name="name"
-                placeholder="Enter your name" 
+                placeholder="Enter your name"
                 value={formData.name}
                 onChange={handleInputChange}
-                required 
+                required
               />
             </div>
 
             <div className="form-group">
               <label htmlFor="jobTitle">Current Job Title</label>
-              <select 
-                id="jobTitle" 
+              <select
+                id="jobTitle"
                 name="jobTitle"
                 value={formData.jobTitle}
                 onChange={handleInputChange}
+                required // Mark as required
               >
                 <option value="">Select a job title</option>
                 {jobTitles.map((title, index) => (
@@ -112,11 +153,12 @@ const ApplyForm = () => {
 
             <div className="form-group">
               <label htmlFor="location">Current Work Location</label>
-              <select 
-                id="location" 
+              <select
+                id="location"
                 name="location"
                 value={formData.location}
                 onChange={handleInputChange}
+                required // Mark as required
               >
                 <option value="">Select a location</option>
                 {indianStates.map((state, index) => (
@@ -133,37 +175,37 @@ const ApplyForm = () => {
         {currentStep === 2 && (
           <div id="step2">
             <h2>Step 2: Additional Information</h2>
-            
+
             <div className="form-group">
               <label>Experience</label>
               <div className="options-container">
-                <OptionButton 
-                  field="experience" 
-                  value="0-1 yr" 
+                <OptionButton
+                  field="experience"
+                  value="0-1 yr"
                   isSelected={formData.experience === "0-1 yr"}
                   onClick={selectOption}
                 >
                   0-1 yr
                 </OptionButton>
-                <OptionButton 
-                  field="experience" 
-                  value="1-5 yr" 
+                <OptionButton
+                  field="experience"
+                  value="1-5 yr"
                   isSelected={formData.experience === "1-5 yr"}
                   onClick={selectOption}
                 >
                   1-5 yr
                 </OptionButton>
-                <OptionButton 
-                  field="experience" 
-                  value="5-10 yr" 
+                <OptionButton
+                  field="experience"
+                  value="5-10 yr"
                   isSelected={formData.experience === "5-10 yr"}
                   onClick={selectOption}
                 >
                   5-10 yr
                 </OptionButton>
-                <OptionButton 
-                  field="experience" 
-                  value="10+ yr" 
+                <OptionButton
+                  field="experience"
+                  value="10+ yr"
                   isSelected={formData.experience === "10+ yr"}
                   onClick={selectOption}
                 >
@@ -175,33 +217,33 @@ const ApplyForm = () => {
             <div className="form-group">
               <label>Expected Salary Range</label>
               <div className="options-container">
-                <OptionButton 
-                  field="expectedSalary" 
-                  value="0-5 LPA" 
+                <OptionButton
+                  field="expectedSalary"
+                  value="0-5 LPA"
                   isSelected={formData.expectedSalary === "0-5 LPA"}
                   onClick={selectOption}
                 >
                   0-5 LPA
                 </OptionButton>
-                <OptionButton 
-                  field="expectedSalary" 
-                  value="5-10 LPA" 
+                <OptionButton
+                  field="expectedSalary"
+                  value="5-10 LPA"
                   isSelected={formData.expectedSalary === "5-10 LPA"}
                   onClick={selectOption}
                 >
                   5-10 LPA
                 </OptionButton>
-                <OptionButton 
-                  field="expectedSalary" 
-                  value="10-20 LPA" 
+                <OptionButton
+                  field="expectedSalary"
+                  value="10-20 LPA"
                   isSelected={formData.expectedSalary === "10-20 LPA"}
                   onClick={selectOption}
                 >
                   10-20 LPA
                 </OptionButton>
-                <OptionButton 
-                  field="expectedSalary" 
-                  value="20+ LPA" 
+                <OptionButton
+                  field="expectedSalary"
+                  value="20+ LPA"
                   isSelected={formData.expectedSalary === "20+ LPA"}
                   onClick={selectOption}
                 >
@@ -213,33 +255,33 @@ const ApplyForm = () => {
             <div className="form-group">
               <label>Current Salary Range</label>
               <div className="options-container">
-                <OptionButton 
-                  field="currentSalary" 
-                  value="0-5 LPA" 
+                <OptionButton
+                  field="currentSalary"
+                  value="0-5 LPA"
                   isSelected={formData.currentSalary === "0-5 LPA"}
                   onClick={selectOption}
                 >
                   0-5 LPA
                 </OptionButton>
-                <OptionButton 
-                  field="currentSalary" 
-                  value="5-10 LPA" 
+                <OptionButton
+                  field="currentSalary"
+                  value="5-10 LPA"
                   isSelected={formData.currentSalary === "5-10 LPA"}
                   onClick={selectOption}
                 >
                   5-10 LPA
                 </OptionButton>
-                <OptionButton 
-                  field="currentSalary" 
-                  value="10-20 LPA" 
+                <OptionButton
+                  field="currentSalary"
+                  value="10-20 LPA"
                   isSelected={formData.currentSalary === "10-20 LPA"}
                   onClick={selectOption}
                 >
                   10-20 LPA
                 </OptionButton>
-                <OptionButton 
-                  field="currentSalary" 
-                  value="20+ LPA" 
+                <OptionButton
+                  field="currentSalary"
+                  value="20+ LPA"
                   isSelected={formData.currentSalary === "20+ LPA"}
                   onClick={selectOption}
                 >
@@ -254,6 +296,7 @@ const ApplyForm = () => {
         )}
       </div>
 
+      {/* Added CSS for form messages */}
       <style jsx>{`
         body {
           font-family: 'Roboto', sans-serif;
@@ -383,20 +426,31 @@ const ApplyForm = () => {
           animation: fadeIn 1s ease-in-out;
         }
 
+        .form-message { /* New style for messages */
+          background-color: #e0f7fa;
+          color: #00796b;
+          padding: 10px 15px;
+          border-radius: 8px;
+          margin-bottom: 20px;
+          text-align: center;
+          font-weight: 500;
+          border: 1px solid #b2ebf2;
+        }
+
         @media (max-width: 768px) {
           .container {
             margin: 20px;
             padding: 15px;
           }
-          
+
           .option {
             flex: 1 1 100%;
           }
-          
+
           .top-bar {
             padding: 10px 15px;
           }
-          
+
           .top-bar h1 {
             font-size: 18px;
           }

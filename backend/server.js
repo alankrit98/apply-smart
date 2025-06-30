@@ -22,10 +22,10 @@ connectDB();
 // --- Step 5: Define API routes ---
 // You only need to require your routes once
 const userRoutes = require('./routes/userRoutes');
-const applicationRoutes = require('./routes/applicationRoutes');
+const applicationRoutes = require('./routes/applicationRoutes'); // Import the new application routes
 
 app.use('/api/users', userRoutes);
-app.use('/api/applications', applicationRoutes);
+app.use('/api/applications', applicationRoutes); // Use the new application routes
 
 
 // --- Step 6: Start the server ---
