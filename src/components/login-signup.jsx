@@ -1,6 +1,7 @@
 import './auth.css';
 import { useNavigate } from 'react-router-dom';
 import React, { useState } from "react";
+import axios from 'axios'; 
 
 const LoginSignup = () => {
   const [isLogin, setIsLogin] = useState(true);
@@ -20,35 +21,40 @@ const LoginSignup = () => {
     setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
-  const handleSignup = (e) => {
+  const handleSignup = async (e) => {
     e.preventDefault();
 
-    const userData = {
-      name: formData.name,
-      email: formData.email,
-      password: formData.password
-    };
-
-    localStorage.setItem('user', JSON.stringify(userData));
-    alert('Signup successful! Please login.');
-    navigate('/applyform');
+    try {
+      // Removed localStorage logic and replaced it with API call
+      const response = await axios.post('http://localhost:5000/api/users/signup', {
+        name: formData.name,
+        email: formData.email,
+        password: formData.password,
+      });
+      alert('Signup successful! Please login.'); // Notify user of success
+      navigate('/applyform');
+    } catch (error) {
+      console.error('Error during signup:', error);
+      alert('Signup failed. Please try again.');
+    }
+    
+    
   };
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
 
-    const savedUser = JSON.parse(localStorage.getItem('user'));
-
-    if (
-      savedUser &&
-      savedUser.email === formData.email &&
-      savedUser.password === formData.password
-    ) {
-      localStorage.setItem('isLoggedIn', 'true');
-      alert(`Welcome back, ${savedUser.name}!`);
-      // Navigate or redirect as needed
-      navigate('/home');
-    } else {
+    try {
+      // Removed localStorage logic and replaced it with API call
+      const response = await axios.post('http://localhost:5000/api/users/login', {
+        email: formData.email,
+        password: formData.password,
+      });
+      const userData = response.data;
+      alert(`Welcome back, ${userData.name}!`); // Welcome user after successful login
+      navigate('/home'); // Navigate to home page
+    } catch (error) {
+      console.error('Error during login:', error);
       alert('Invalid email or password!');
     }
   };
