@@ -1,5 +1,6 @@
 import jwt_decode from "jwt-decode";
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom'; 
 import { Briefcase, Users, Star, TrendingUp } from 'lucide-react';
 import axios from 'axios';
 
@@ -416,12 +417,18 @@ const ApplySmartHomePage = () => {
               textDecoration: 'none',
               paddingBottom: '4px'
             }}>Application Tracker</a>
-            <a href="#" className="nav-link" style={{ 
-              color: '#374151', 
-              fontWeight: '500', 
-              textDecoration: 'none',
-              paddingBottom: '4px'
-            }}>Explore Jobs</a>
+            <Link 
+        to="/explore-jobs" // 2. Use the 'to' prop to specify the destination
+        className="nav-link" 
+        style={{ 
+          color: '#374151', 
+          fontWeight: '500', 
+          textDecoration: 'none',
+          paddingBottom: '4px'
+        }}
+      >
+        Explore Jobs
+      </Link>
             <a href="#" className="nav-link" style={{ 
               color: '#374151', 
               fontWeight: '500', 

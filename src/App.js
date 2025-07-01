@@ -5,6 +5,7 @@ import ApplicationTracker from "./components/applicationtracker"; // Ensure corr
  import LoginSignup from "./components/login-signup";
  import ApplyForm from "./components/applyform";
  import Home from "./components/home";
+ import ExploreJobs from './components/explorejobs';
 
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
         <Route path="/login-signup" element={<LoginSignup />} />
         <Route path="/applyform" element={<ApplyForm />} />
         <Route path = "/home" element={<Home />} />
+        <Route path="/explore-jobs" element={<ExploreJobs />} />
       </Routes>
     </Router>
   );
