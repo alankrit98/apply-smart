@@ -1,6 +1,7 @@
-import React, { useEffect, useRef } from "react"; // ✅ include useRef here
+import React, { useEffect, useRef } from "react";
+import * as bootstrap from "bootstrap";
 import "bootstrap/dist/css/bootstrap.min.css";
-import "bootstrap/dist/js/bootstrap.bundle.min.js";
+// import "bootstrap/dist/js/bootstrap.bundle.min.js"; // 👈 REMOVED: See explanation below
 import { Link } from "react-router-dom";
 import "@fortawesome/fontawesome-free/css/all.min.css";
 import "aos/dist/aos.css";
@@ -10,7 +11,7 @@ import "./landing.css";
 
 const Landing = () => {
   const navigate = useNavigate();
-  const carouselRef = useRef(null); // ✅ this line fixes your error
+  const carouselRef = useRef(null);
 
   useEffect(() => {
     AOS.init({
@@ -18,14 +19,24 @@ const Landing = () => {
       once: true,
     });
 
-    const bootstrap = require("bootstrap");
+    // We will import Bootstrap's JS programmatically to control the carousel
+    
+    let carouselInstance = null;
+
     if (carouselRef.current) {
-      new bootstrap.Carousel(carouselRef.current, {
+      carouselInstance = new bootstrap.Carousel(carouselRef.current, {
         interval: 2000,
         ride: "carousel",
         pause: false,
         wrap: true,
       });
+    }
+    
+    // Cleanup function to destroy the carousel instance when the component unmounts
+    return () => {
+      if(carouselInstance) {
+        carouselInstance.dispose();
+      }
     }
   }, []);
 
@@ -162,7 +173,7 @@ const Landing = () => {
         </div>
       </div>
 
-      {/* Slider Section – Keep Only This One */}
+      {/* Slider Section */}
       <section className="slider my-5 py-5" id="sliderCarousel">
         <div
           ref={carouselRef}
@@ -331,6 +342,7 @@ const Landing = () => {
           </div>
         </div>
       </section>
+      
       {/* Testimonials Section */}
       <section
         className="testimonials py-5"
@@ -404,47 +416,21 @@ const Landing = () => {
             </div>
           </div>
         </div>
-
       </section>
-=======
-      </div>
-    </div>
-  </div>
-</section>
 
-{/* Ready To Get Started Section */}
-<section className="ready-start py-5" data-aos="fade-up">
-  <div className="container text-center">
-    <h2 className="mb-4">Ready to get started?</h2>
-    <p className="mb-4">
-      Join Apply Smart today and fast-track your job applications!
-    </p>
-     <button
-      onClick={handleGetStarted}
-      className="btn btn-primary rounded-pill px-4"
-    >
-      Get Started
-    </button>
-  </div>
-</section>
-
-
-
-      {/* Ready To Get Started Section */}
+      {/* Ready To Get Started Section - DUPLICATE REMOVED */}
       <section className="ready-start py-5" data-aos="fade-up">
         <div className="container text-center">
           <h2 className="mb-4">Ready to get started?</h2>
           <p className="mb-4">
             Join Apply Smart today and fast-track your job applications!
           </p>
-          <a
-            href="#"
-            data-bs-toggle="modal"
-            data-bs-target="#authModal"
+          <button
+            onClick={handleGetStarted}
             className="btn btn-primary rounded-pill px-4"
           >
             Get Started
-          </a>
+          </button>
         </div>
       </section>
 
