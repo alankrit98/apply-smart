@@ -435,12 +435,14 @@ const ApplySmartHomePage = () => {
               textDecoration: 'none',
               paddingBottom: '4px'
             }}>Resume Builder</a>
-            <a href="#" className="nav-link" style={{ 
+            <Link
+            to ="/profile-page"
+             className="nav-link" style={{ 
               color: '#374151', 
               fontWeight: '500', 
               textDecoration: 'none',
               paddingBottom: '4px'
-            }}>Profile</a>
+            }}>Profile</Link>
           </div>
 
           {/* Mobile Menu Button */}

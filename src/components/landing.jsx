@@ -1,64 +1,88 @@
 import React, { useEffect, useRef } from "react";
 import * as bootstrap from "bootstrap";
 import "bootstrap/dist/css/bootstrap.min.css";
-// import "bootstrap/dist/js/bootstrap.bundle.min.js"; // 👈 REMOVED: See explanation below
+// import "bootstrap/dist/js/bootstrap.bundle.min.js"; // 👈 REMOVED: Bootstrap JS is imported and initialized programmatically
 import { Link } from "react-router-dom";
 import "@fortawesome/fontawesome-free/css/all.min.css";
 import "aos/dist/aos.css";
 import { useNavigate } from "react-router-dom";
 import AOS from "aos";
-import "./landing.css";
+import "./landing.css"; // Assuming you have a landing.css file for custom styles
 
 const Landing = () => {
   const navigate = useNavigate();
   const carouselRef = useRef(null);
+  const authModalRef = useRef(null); // Ref for the Bootstrap Modal
+
+  // Declare modalInstance outside useEffect to make it accessible for cleanup
+  let modalInstance = null;
 
   useEffect(() => {
+    // Initialize AOS (Animate On Scroll) library
     AOS.init({
-      duration: 1200,
-      once: true,
+      duration: 1200, // Animation duration
+      once: true, // Whether animation should happen only once - while scrolling down
     });
 
-    // We will import Bootstrap's JS programmatically to control the carousel
-    
+    // Initialize Bootstrap Carousel programmatically
     let carouselInstance = null;
-
     if (carouselRef.current) {
       carouselInstance = new bootstrap.Carousel(carouselRef.current, {
-        interval: 2000,
-        ride: "carousel",
-        pause: false,
-        wrap: true,
+        interval: 2000, // Time between slides in milliseconds
+        ride: "carousel", // Autoplay the carousel on page load
+        pause: false, // Do not pause on hover
+        wrap: true, // Continue sliding from the last to the first item
       });
     }
-    
-    // Cleanup function to destroy the carousel instance when the component unmounts
-    return () => {
-      if(carouselInstance) {
-        carouselInstance.dispose();
-      }
-    }
-  }, []);
 
+    // Initialize Bootstrap Modal programmatically
+    if (authModalRef.current) {
+      modalInstance = new bootstrap.Modal(authModalRef.current);
+    }
+
+    // Cleanup function: This runs when the component unmounts
+    return () => {
+      if (carouselInstance) {
+        carouselInstance.dispose(); // Dispose of the carousel instance to prevent memory leaks
+      }
+      if (modalInstance) {
+        modalInstance.dispose(); // Dispose of the modal instance
+      }
+    };
+  }, []); // Empty dependency array means this effect runs once after the initial render
+
+  // Handler for carousel previous button
   const handlePrev = () => {
-    const bootstrap = require("bootstrap");
     const carousel = bootstrap.Carousel.getInstance(carouselRef.current);
     if (carousel) carousel.prev();
   };
 
+  // Handler for carousel next button
   const handleNext = () => {
-    const bootstrap = require("bootstrap");
     const carousel = bootstrap.Carousel.getInstance(carouselRef.current);
     if (carousel) carousel.next();
   };
 
+  // Handler for the "Activate Extension" button in Hero section
   const handleGetStarted = () => {
-    navigate("/login-signup");
+    navigate("/login-signup"); // Navigates to the login/signup page
+  };
+
+  // Handler for showing the authentication modal (used by carousel buttons)
+  const handleShowAuthModal = (e) => {
+    e.preventDefault(); // Prevent default link behavior (e.g., navigating to '#')
+    if (authModalRef.current) {
+      // Get the existing modal instance or create a new one if it somehow wasn't initialized
+      const currentModalInstance =
+        bootstrap.Modal.getInstance(authModalRef.current) ||
+        new bootstrap.Modal(authModalRef.current);
+      currentModalInstance.show(); // Show the modal
+    }
   };
 
   return (
     <>
-      {/* Navbar */}
+      {/* Navbar Section */}
       <nav className="navbar navbar-expand-lg navbar-light">
         <div className="container">
           <a className="navbar-brand fw-bold text-primary" href="#">
@@ -67,7 +91,7 @@ const Landing = () => {
               width="40"
               height="40"
               className="me-2"
-              alt="White Fox Logo"
+              alt="Apply Smart Logo"
             />
             Apply Smart
           </a>
@@ -76,6 +100,9 @@ const Landing = () => {
             type="button"
             data-bs-toggle="collapse"
             data-bs-target="#navbarNav"
+            aria-controls="navbarNav"
+            aria-expanded="false"
+            aria-label="Toggle navigation"
           >
             <span className="navbar-toggler-icon"></span>
           </button>
@@ -102,6 +129,7 @@ const Landing = () => {
                 </a>
               </li>
               <li className="nav-item">
+                {/* This button navigates directly using react-router-dom */}
                 <Link
                   className="btn btn-primary rounded-pill px-4"
                   to="/login-signup"
@@ -140,13 +168,15 @@ const Landing = () => {
         </div>
       </section>
 
-      {/* Modal */}
+      {/* Authentication Modal */}
+      {/* The ref is correctly placed inside the opening div tag */}
       <div
         className="modal fade"
         id="authModal"
         tabIndex="-1"
         aria-labelledby="authModalLabel"
         aria-hidden="true"
+        ref={authModalRef}
       >
         <div className="modal-dialog">
           <div className="modal-content">
@@ -162,6 +192,7 @@ const Landing = () => {
               ></button>
             </div>
             <div className="modal-body">
+              {/* The iframe will load the login-signup page */}
               <iframe
                 src="login-signup"
                 frameBorder="0"
@@ -173,7 +204,7 @@ const Landing = () => {
         </div>
       </div>
 
-      {/* Slider Section */}
+      {/* Slider Section (Carousel) */}
       <section className="slider my-5 py-5" id="sliderCarousel">
         <div
           ref={carouselRef}
@@ -181,16 +212,17 @@ const Landing = () => {
           id="sliderCarouselInner"
         >
           <div className="carousel-inner text-center">
+            {/* Carousel Item 1 */}
             <div className="carousel-item active">
               <h1 className="mb-4">
                 Effortless Job{" "}
                 <span style={{ color: "yellow" }}>Applications</span>, Seamless
                 Career <span style={{ color: "yellow" }}>Growth</span>
               </h1>
+              {/* Button to trigger modal programmatically */}
               <a
                 href="#"
-                data-bs-toggle="modal"
-                data-bs-target="#authModal"
+                onClick={handleShowAuthModal}
                 className="btn btn-sm mt-4 rounded-pill d-flex align-items-center justify-content-center gap-2"
                 style={{
                   padding: "8px 16px",
@@ -212,15 +244,16 @@ const Landing = () => {
               </a>
             </div>
 
+            {/* Carousel Item 2 */}
             <div className="carousel-item">
               <h1 className="mb-4">
                 Craft Perfect <span style={{ color: "yellow" }}>Resumes</span>{" "}
                 That Land <span style={{ color: "yellow" }}>Interviews</span>.
               </h1>
+              {/* Button to trigger modal programmatically */}
               <a
                 href="#"
-                data-bs-toggle="modal"
-                data-bs-target="#authModal"
+                onClick={handleShowAuthModal}
                 className="btn btn-sm mt-4 rounded-pill d-flex align-items-center justify-content-center gap-2"
                 style={{
                   padding: "8px 16px",
@@ -243,7 +276,7 @@ const Landing = () => {
             </div>
           </div>
 
-          {/* Working Prev/Next Buttons */}
+          {/* Carousel Previous/Next Buttons */}
           <button
             className="carousel-control-prev"
             type="button"
@@ -342,7 +375,7 @@ const Landing = () => {
           </div>
         </div>
       </section>
-      
+
       {/* Testimonials Section */}
       <section
         className="testimonials py-5"
@@ -418,7 +451,7 @@ const Landing = () => {
         </div>
       </section>
 
-      {/* Ready To Get Started Section - DUPLICATE REMOVED */}
+      {/* Ready To Get Started Section */}
       <section className="ready-start py-5" data-aos="fade-up">
         <div className="container text-center">
           <h2 className="mb-4">Ready to get started?</h2>
@@ -434,6 +467,7 @@ const Landing = () => {
         </div>
       </section>
 
+      {/* Footer Section */}
       <footer className="footer-section py-5 text-white">
         <div className="container">
           <div className="row">
