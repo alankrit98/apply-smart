@@ -50,6 +50,7 @@ const LoginSignup = () => {
         email: formData.email,
         password: formData.password,
       });
+      localStorage.setItem('token', response.data.token);
       const userData = response.data;
       alert(`Welcome back, ${userData.name}!`); // Welcome user after successful login
       navigate('/home'); // Navigate to home page
