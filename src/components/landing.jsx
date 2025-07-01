@@ -4,10 +4,12 @@ import "bootstrap/dist/js/bootstrap.bundle.min.js";
 import { Link } from "react-router-dom";
 import "@fortawesome/fontawesome-free/css/all.min.css";
 import "aos/dist/aos.css";
+import { useNavigate } from "react-router-dom";
 import AOS from "aos";
 import "./landing.css";
 
 const Landing = () => {
+  const navigate = useNavigate();
   const carouselRef = useRef(null); // ✅ this line fixes your error
 
   useEffect(() => {
@@ -37,6 +39,10 @@ const Landing = () => {
     const bootstrap = require("bootstrap");
     const carousel = bootstrap.Carousel.getInstance(carouselRef.current);
     if (carousel) carousel.next();
+  };
+
+  const handleGetStarted = () => {
+    navigate("/login-signup");
   };
 
   return (
@@ -106,13 +112,13 @@ const Landing = () => {
               Maximize your chances of getting hired by applying to more jobs
               with personalized <br /> precision and speed.
             </p>
-            <a
-              href="#"
+            <button
+              onClick={handleGetStarted}
               className="btn btn-lg mt-4 px-4 rounded-pill"
               style={{ background: "linear-gradient(45deg, #007bff, #00c6ff)" }}
             >
               Activate Extension
-            </a>
+            </button>
           </div>
           <div className="vidcontainer me-4">
             <video controls>
@@ -398,7 +404,31 @@ const Landing = () => {
             </div>
           </div>
         </div>
+
       </section>
+=======
+      </div>
+    </div>
+  </div>
+</section>
+
+{/* Ready To Get Started Section */}
+<section className="ready-start py-5" data-aos="fade-up">
+  <div className="container text-center">
+    <h2 className="mb-4">Ready to get started?</h2>
+    <p className="mb-4">
+      Join Apply Smart today and fast-track your job applications!
+    </p>
+     <button
+      onClick={handleGetStarted}
+      className="btn btn-primary rounded-pill px-4"
+    >
+      Get Started
+    </button>
+  </div>
+</section>
+
+
 
       {/* Ready To Get Started Section */}
       <section className="ready-start py-5" data-aos="fade-up">
