@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom'; 
+
 import { Bell, User, Search, MapPin, Zap, CheckCircle, AlertCircle, Menu, X, Plus, Upload, Edit, Trash2, FileText, Briefcase, Award, Target } from 'lucide-react';
 
 const Profile = () => {
@@ -353,37 +355,50 @@ const Profile = () => {
             gap: '40px',
             animation: isLoaded ? 'fadeInUp 0.8s ease 0.4s both' : ''
           }} className="nav-links">
-            <a href="#" className="nav-link" style={{
-              color: '#374151',
-              fontWeight: '500',
-              textDecoration: 'none',
-              paddingBottom: '4px'
-            }}>Home</a>
+            <Link
+                        to = "/home" className="nav-link" style={{
+                          color: '#374151',
+                          
+                          fontWeight: '500',
+                          paddingBottom: '4px',
+                          textDecoration: 'none'
+                        }}>Home</Link>
             <a href="#" className="nav-link" style={{ 
               color: '#374151', 
               fontWeight: '500', 
               textDecoration: 'none',
               paddingBottom: '4px'
             }}>Application Tracker</a>
-            <a href="#" className="nav-link" style={{ 
-              color: '#374151', 
+            <Link 
+        to="/explore-jobs" // 2. Use the 'to' prop to specify the destination
+        className="nav-link" 
+        style={{ 
+          color: '#374151', 
               fontWeight: '500', 
-              textDecoration: 'none',
-              paddingBottom: '4px'
-            }}>Explore Jobs</a>
+           
+         
+         
+          textDecoration: 'none',
+          paddingBottom: '4px'
+        }}
+      >
+        Explore Jobs
+      </Link>
             <a href="#" className="nav-link" style={{ 
               color: '#374151', 
               fontWeight: '500', 
               textDecoration: 'none',
               paddingBottom: '4px'
             }}>Resume Builder</a>
-            <a href="#" className="nav-link" style={{ 
-              color: '#2563eb',
-              fontWeight: '600',
-              borderBottom: '2px solid #2563eb',
-              paddingBottom: '4px',
-              textDecoration: 'none'
-            }}>Profile</a>
+            <Link
+            to ="/profile-page"
+             className="nav-link" style={{ 
+               color: '#2563eb',
+                          fontWeight: '600',
+                          borderBottom: '2px solid #2563eb',
+              textDecoration: 'none',
+              paddingBottom: '4px'
+            }}>Profile</Link>
           </div>
 
           {/* Mobile Menu Button */}

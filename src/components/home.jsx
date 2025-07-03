@@ -3,10 +3,11 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom'; 
 import { Briefcase, Users, Star, TrendingUp } from 'lucide-react';
 import axios from 'axios';
-
+import { useNavigate } from 'react-router-dom';
 import { Bell, User, Search, MapPin, Zap, CheckCircle, AlertCircle, Menu, X } from 'lucide-react';
 
 const ApplySmartHomePage = () => {
+  const navigate = useNavigate();
   const [userName, setUserName] = useState("");
   useEffect(() => {
     const fetchUserName = async () => {
@@ -404,13 +405,14 @@ const ApplySmartHomePage = () => {
             gap: '40px',
             animation: isLoaded ? 'fadeInUp 0.8s ease 0.4s both' : ''
           }} className="nav-links">
-            <a href="#" className="nav-link" style={{
+            <Link
+            to = "/home" className="nav-link" style={{
               color: '#2563eb',
               fontWeight: '600',
               borderBottom: '2px solid #2563eb',
               paddingBottom: '4px',
               textDecoration: 'none'
-            }}>Home</a>
+            }}>Home</Link>
             <a href="#" className="nav-link" style={{ 
               color: '#374151', 
               fontWeight: '500', 
@@ -760,6 +762,7 @@ const ApplySmartHomePage = () => {
             }}
             onMouseEnter={(e) => e.target.style.transform = 'translateY(-2px)'}
             onMouseLeave={(e) => e.target.style.transform = 'translateY(0)'}
+            onClick={() => navigate('/profile-page')}
             >
               Complete Now
             </button>

@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom'; 
+
 import { Bell, User, Search, MapPin, Briefcase, DollarSign, Clock, Building, Calendar, ArrowRight, Menu, X, Star, MapPin as LocationIcon, CheckCircle, ExternalLink, Bookmark } from 'lucide-react';
 
 const ExploreJobsPage = () => {
@@ -13,7 +15,8 @@ const ExploreJobsPage = () => {
   const [isLocationFocused, setIsLocationFocused] = useState(false);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
 
-  // Sample job data
+  
+
   const allJobs = [
     {
       id: 1,
@@ -384,43 +387,54 @@ const ExploreJobsPage = () => {
           </div>
 
           {/* Desktop Navigation */}
-          <div style={{
-            display: 'flex',
-            alignItems: 'center',
+         <div style={{ 
+            display: 'flex', 
+            alignItems: 'center', 
             gap: '40px',
             animation: isLoaded ? 'fadeInUp 0.8s ease 0.4s both' : ''
           }} className="nav-links">
-            <a href="#" className="nav-link" style={{
-              color: '#374151',
-              fontWeight: '500',
-              textDecoration: 'none',
-              paddingBottom: '4px'
-            }}>Home</a>
-            <a href="#" className="nav-link" style={{
-              color: '#374151',
-              fontWeight: '500',
+            <Link
+                        to = "/home" className="nav-link" style={{
+                          color: '#374151', 
+                          fontWeight: '500',
+                          
+                          paddingBottom: '4px',
+                          textDecoration: 'none'
+                        }}>Home</Link>
+            <a href="#" className="nav-link" style={{ 
+              color: '#374151', 
+              fontWeight: '500', 
               textDecoration: 'none',
               paddingBottom: '4px'
             }}>Application Tracker</a>
-            <a href="#" className="nav-link" style={{
-              color: '#2563eb',
-              fontWeight: '600',
-              borderBottom: '2px solid #2563eb',
-              paddingBottom: '4px',
-              textDecoration: 'none'
-            }}>Explore Jobs</a>
-            <a href="#" className="nav-link" style={{
-              color: '#374151',
-              fontWeight: '500',
+            <Link 
+        to="/explore-jobs" // 2. Use the 'to' prop to specify the destination
+        className="nav-link" 
+        style={{ 
+          
+          color: '#2563eb',
+          fontWeight: '600', 
+          borderBottom: '2px solid #2563eb',
+          textDecoration: 'none',
+          paddingBottom: '4px'
+        }}
+      >
+        Explore Jobs
+      </Link>
+            <a href="#" className="nav-link" style={{ 
+              color: '#374151', 
+              fontWeight: '500', 
               textDecoration: 'none',
               paddingBottom: '4px'
             }}>Resume Builder</a>
-            <a href="#" className="nav-link" style={{
-              color: '#374151',
-              fontWeight: '500',
+            <Link
+            to ="/profile-page"
+             className="nav-link" style={{ 
+              color: '#374151', 
+              fontWeight: '500', 
               textDecoration: 'none',
               paddingBottom: '4px'
-            }}>Profile</a>
+            }}>Profile</Link>
           </div>
 
           {/* Mobile Menu Button */}

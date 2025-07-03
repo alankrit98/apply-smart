@@ -4,10 +4,12 @@ import "bootstrap/dist/js/bootstrap.bundle.min.js";
 import { Link } from "react-router-dom";
 import "@fortawesome/fontawesome-free/css/all.min.css";
 import "aos/dist/aos.css";
+import { useNavigate } from "react-router-dom";
 import AOS from "aos";
 import "./landing.css";
 
 const Landing = () => {
+  const navigate = useNavigate();
   const carouselRef = useRef(null); // ✅ this line fixes your error
 
   useEffect(() => {
@@ -26,6 +28,9 @@ const Landing = () => {
       });
     }
   }, []);
+   const handleGetStarted = () => {
+    navigate("/login-signup"); // Navigates to the login/signup page
+  };
 
   const handlePrev = () => {
     const bootstrap = require("bootstrap");
@@ -106,13 +111,13 @@ const Landing = () => {
               Simplify automatically saves job applications you submit to help you<br/> manage your
 job search and follow up at the right time, every time.
             </p>
-            <a
-              href="#"
+            <button
+              onClick={handleGetStarted}
               className="btn btn-lg mt-4 px-4 rounded-pill"
               style={{ background: "linear-gradient(45deg, #007bff, #00c6ff)" }}
             >
               Activate Extension
-            </a>
+            </button>
           </div>
           <div className="vidcontainer me-4">
             <video controls>
