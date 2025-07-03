@@ -1329,9 +1329,11 @@ const ApplySmartHomePage = () => {
               e.target.style.transform = 'translateY(-2px)';
               e.target.style.boxShadow = '0 8px 15px rgba(0,0,0,0.2)';
             }}
+            onClick={() => navigate('/profile-page')}
             onMouseLeave={(e) => {
               e.target.style.transform = 'translateY(0)';
               e.target.style.boxShadow = '0 4px 6px rgba(0,0,0,0.1)';
+              
             }}>
               Complete Profile
             </button>
@@ -1351,10 +1353,14 @@ const ApplySmartHomePage = () => {
               e.target.style.transform = 'translateY(-2px)';
               e.target.style.backgroundColor = 'rgba(255,255,255,0.1)';
             }}
+
             onMouseLeave={(e) => {
               e.target.style.transform = 'translateY(0)';
               e.target.style.backgroundColor = 'transparent';
-            }}>
+            }}
+                          onClick= {() => navigate('/explore-jobs')}
+
+            >
               Start Exploring
             </button>
           </div>

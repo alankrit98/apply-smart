@@ -65,6 +65,10 @@ const Landing = () => {
 
   // Handler for the "Activate Extension" button in Hero section
   const handleGetStarted = () => {
+    if (authModalRef.current) {
+    const modal = bootstrap.Modal.getInstance(authModalRef.current);
+    if (modal) modal.hide();
+  }
     navigate("/login-signup"); // Navigates to the login/signup page
   };
 
