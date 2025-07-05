@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom'; 
-
+import { useNavigate } from 'react-router-dom';
 import { Bell, User, Search, MapPin, Zap, CheckCircle, AlertCircle, Menu, X, Plus, Upload, Edit, Trash2, FileText, Briefcase, Award, Target } from 'lucide-react';
 
 const Profile = () => {
@@ -9,6 +9,8 @@ const Profile = () => {
   const [isLoaded, setIsLoaded] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+
+  const navigate = useNavigate();
   
   // Profile states
   const [hasProfile, setHasProfile] = useState(false);
@@ -21,6 +23,7 @@ const Profile = () => {
     setIsLoaded(true);
     // Simulate fetching user data
     setUserName("John Doe");
+    
     
     // Mouse tracking for subtle parallax effects
     const handleMouseMove = (e) => {
@@ -64,7 +67,7 @@ const Profile = () => {
     setResumeFile(null);
     
     // TODO: Navigate to detailed form
-    alert('Profile created! Now you will be redirected to complete your profile details.');
+    navigate('/extendedprofile');
   };
 
   const handleDeleteProfile = () => {

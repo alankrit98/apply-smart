@@ -7,6 +7,7 @@ import ApplicationTracker from "./components/applicationtracker"; // Ensure corr
  import Home from "./components/home";
  import ExploreJobs from './components/explorejobs';
  import Profile from './components/profile';
+ import ExtendedProfile from './components/extendedprofile';
 
 function App() {
   return (
@@ -22,6 +23,7 @@ function App() {
         <Route path = "/home" element={<Home />} />
         <Route path="/explore-jobs" element={<ExploreJobs />} />
         <Route path = "/profile-page" element={<Profile />} />
+        <Route path = "/extendedprofile" element = {<ExtendedProfile />} />
       </Routes>
     </Router>
   );
