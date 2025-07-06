@@ -41,13 +41,8 @@ const Profile = () => {
   useEffect(() => {
     setIsLoaded(true);
     // Simulate fetching user data
-<<<<<<< Updated upstream
-    setUserName("John Doe");
-
-=======
     // setUserName("John Doe");
     
->>>>>>> Stashed changes
     // Mouse tracking for subtle parallax effects
     const handleMouseMove = (e) => {
       setMousePosition({
