@@ -528,12 +528,13 @@ const ProfileDetailsPage = () => {
               paddingBottom: '4px',
               textDecoration: 'none'
             }}>Home</Link>
-            <a href="#" className="nav-link" style={{
+            <Link to = "/tracker"
+             className="nav-link" style={{
               color: '#374151',
               fontWeight: '500',
               textDecoration: 'none',
               paddingBottom: '4px'
-            }}>Application Tracker</a>
+            }}>Application Tracker</Link>
             <Link to="/explore-jobs" className="nav-link" style={{
               color: '#374151',
               fontWeight: '500',
