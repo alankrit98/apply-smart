@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import { Link } from 'react-router-dom'; 
 
 import { Bell, User, Search, MapPin, Briefcase, DollarSign, Clock, Building, Calendar, ArrowRight, Menu, X, Star, MapPin as LocationIcon, CheckCircle, ExternalLink, Bookmark } from 'lucide-react';
@@ -14,6 +15,7 @@ const ExploreJobsPage = () => {
   const [isSearchFocused, setIsSearchFocused] = useState(false);
   const [isLocationFocused, setIsLocationFocused] = useState(false);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  const [isProfileComplete, setIsProfileComplete] = useState("");
 
   
 
@@ -175,6 +177,30 @@ const ExploreJobsPage = () => {
       ]
     }
   ];
+
+  useEffect(() => {
+    const fetchUserName = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        if (!token) {
+          console.log('No token found');
+          return;
+        }
+
+        const res = await axios.get('http://localhost:5000/api/users/profile', {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        setIsProfileComplete(res.data.isProfileComplete);
+      } catch (err) {
+        console.error('Failed to fetch user profile', err);
+      }
+    };
+
+    fetchUserName();
+  }, []);
 
   useEffect(() => {
     setIsLoaded(true);
@@ -429,7 +455,7 @@ const ExploreJobsPage = () => {
               paddingBottom: '4px'
             }}>Resume Builder</Link>
             <Link
-            to ="/profile-page"
+            to ={isProfileComplete ? "/profile-page" : "/extendedProfile"}
              className="nav-link" style={{ 
               color: '#374151', 
               fontWeight: '500', 

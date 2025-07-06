@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import { Link } from 'react-router-dom';
 import {useNavigate} from 'react-router-dom';
 import {
@@ -243,6 +244,67 @@ const ProfileDetailsPage = () => {
   const [languages, setLanguages] = useState([]);
   const [certifications, setCertifications] = useState([]);
   const [achievements, setAchievements] = useState([]);
+  const [isProfileComplete, setIsProfileComplete] = useState("");
+
+  const token = localStorage.getItem('token');
+
+  useEffect(() => {
+    const fetchUserName = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        if (!token) {
+          console.log('No token found');
+          return;
+        }
+
+        const res = await axios.get('http://localhost:5000/api/users/profile', {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        setIsProfileComplete(res.data.isProfileComplete);
+      } catch (err) {
+        console.error('Failed to fetch user profile', err);
+      }
+    };
+
+    fetchUserName();
+  }, []);
+
+  useEffect(() => {
+  const fetchExtendedProfile = async () => {
+    try {
+      const token = localStorage.getItem('token'); // or wherever you store it
+
+      const res = await fetch('http://localhost:5000/api/extendedProfile', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      const data = await res.json();
+      if (res.ok) {
+        setPersonalInfo(data.personalInfo || {});
+      setJobPreference(data.jobPreference || {});
+      setWorkExperience(data.workExperience || []);
+      setEducation(data.education || []);
+      setSkills(data.skills || []);
+      setLanguages(data.languages || []);
+      setCertifications(data.certifications || []);
+      setAchievements(data.achievements || []);
+      } else {
+        console.error('Error fetching profile:', data.message);
+      }
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  };
+
+  fetchExtendedProfile();
+}, []);
 
   useEffect(() => {
     let ticking = false;
@@ -298,10 +360,38 @@ const ProfileDetailsPage = () => {
     console.log(`Cancelling edit for ${tabName}`);
   };
 
-  const handleSaveProfile = () => {
-    alert('Profile details Saved');
-    navigate('/home');
+  const handleSaveProfile = async () => {
+  try {
+    const res = await fetch('http://localhost:5000/api/extendedProfile/save', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify({
+        personalInfo,
+        jobPreference,
+        workExperience,
+        education,
+        skills,
+        languages,
+        certifications,
+        achievements
+      })
+    });
+
+    const data = await res.json();
+    if (res.ok) {
+      alert('Profile saved!');
+      navigate('/home');
+    } else {
+      alert('Error saving profile: ' + data.message);
+    }
+  } catch (err) {
+    console.error(err);
+    alert('Network error');
   }
+};
 
   const addWorkExperience = () => {
     setWorkExperience([...workExperience, {
@@ -541,13 +631,13 @@ const ProfileDetailsPage = () => {
               textDecoration: 'none',
               paddingBottom: '4px'
             }}>Explore Jobs</Link>
-            <Link to = 'resume' className="nav-link" style={{
+            <Link to = '/resume' className="nav-link" style={{
               color: '#374151',
               fontWeight: '500',
               textDecoration: 'none',
               paddingBottom: '4px'
             }}>Resume Builder</Link>
-            <Link to="/profile-page" className="nav-link" style={{
+            <Link to={isProfileComplete ? "/profile-page" : "/extendedProfile"} className="nav-link" style={{
               color: '#2563eb',
               fontWeight: '600',
               borderBottom: '2px solid #2563eb',
@@ -652,7 +742,7 @@ const ProfileDetailsPage = () => {
         {/* Back to Profile Button */}
         <div style={{ marginBottom: '40px' }}>
           <Link
-            to="/profile-page"
+            to={isProfileComplete ? "/profile-page" : "/extendedProfile"}
             style={{
               display: 'inline-flex',
               alignItems: 'center',

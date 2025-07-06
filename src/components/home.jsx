@@ -25,6 +25,7 @@ const ApplySmartHomePage = () => {
         });
 
         setUserName(res.data.name); // Set the name to state
+        setIsProfileComplete(res.data.isProfileComplete);
       } catch (err) {
         console.error('Failed to fetch user profile', err);
       }
@@ -32,7 +33,7 @@ const ApplySmartHomePage = () => {
 
     fetchUserName();
   }, []);
-  const [isProfileComplete] = useState(false);
+  const [isProfileComplete, setIsProfileComplete] = useState("");
   const [searchField, setSearchField] = useState("");
   const [location, setLocation] = useState("");
     const [hoveredCard, setHoveredCard] = useState(null);
@@ -440,7 +441,7 @@ const ApplySmartHomePage = () => {
               paddingBottom: '4px'
             }}>Resume Builder</Link>
             <Link
-            to ="/profile-page"
+            to = {isProfileComplete ? "/profile-page" : "/extendedProfile"}
              className="nav-link" style={{ 
               color: '#374151', 
               fontWeight: '500', 
@@ -743,15 +744,15 @@ const ApplySmartHomePage = () => {
           <div style={{ flex: 1 }}>
             <p style={{ fontWeight: '600', fontSize: '18px', margin: 0 }}>
               <span style={{ fontWeight: 'bold' }}>{userName ? userName : 'loading...'},</span> 
-              {!isProfileComplete ? " Complete your profile to apply for jobs" : " Welcome back to ApplySmart"}
+              {isProfileComplete ? " Complete your profile to apply for jobs" : " Welcome back to ApplySmart"}
             </p>
-            {!isProfileComplete && (
+            {isProfileComplete && (
               <p style={{ fontSize: '14px', opacity: 0.8, margin: '4px 0 0 0' }}>
                 Add your skills, experience, and preferences to get better job matches
               </p>
             )}
           </div>
-          {!isProfileComplete && (
+          {isProfileComplete && (
             <button style={{
               padding: '12px 24px',
               backgroundColor: '#f59e0b',
