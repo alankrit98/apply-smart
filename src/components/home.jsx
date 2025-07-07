@@ -9,35 +9,11 @@ import { Bell, User, Search, MapPin, Zap, CheckCircle, AlertCircle, Menu, X } fr
 const ApplySmartHomePage = () => {
   const navigate = useNavigate();
   const [userName, setUserName] = useState("");
-  useEffect(() => {
-    const fetchUserName = async () => {
-      try {
-        const token = localStorage.getItem('token');
-        if (!token) {
-          console.log('No token found');
-          return;
-        }
-
-        const res = await axios.get('http://localhost:5000/api/users/profile', {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-
-        setUserName(res.data.name); // Set the name to state
-        setIsProfileComplete(res.data.isProfileComplete);
-      } catch (err) {
-        console.error('Failed to fetch user profile', err);
-      }
-    };
-
-    fetchUserName();
-  }, []);
-  const [isProfileComplete, setIsProfileComplete] = useState("");
+  const [isProfileComplete, setIsProfileComplete] = useState(null);
   const [searchField, setSearchField] = useState("");
   const [location, setLocation] = useState("");
-    const [hoveredCard, setHoveredCard] = useState(null);
- const [animatedStats, setAnimatedStats] = useState({
+  const [hoveredCard, setHoveredCard] = useState(null);
+  const [animatedStats, setAnimatedStats] = useState({
     users: 0,
     jobs: 0,
     companies: 0
@@ -48,6 +24,30 @@ const ApplySmartHomePage = () => {
   const [isSearchFocused, setIsSearchFocused] = useState(false);
   const [isLocationFocused, setIsLocationFocused] = useState(false);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  useEffect(() => {
+    const fetchUserName = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        if (!token) {
+          console.log('No token found');
+          return;
+        }
+        
+        const res = await axios.get('http://localhost:5000/api/users/profile', {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        
+        setUserName(res.data.name); // Set the name to state
+        setIsProfileComplete(res.data.isProfileComplete);
+      } catch (err) {
+        console.error('Failed to fetch user profile', err);
+      }
+    };
+
+    fetchUserName();
+  }, []);
 
   useEffect(() => {
     setIsLoaded(true);
@@ -1332,13 +1332,19 @@ const ApplySmartHomePage = () => {
               e.target.style.transform = 'translateY(-2px)';
               e.target.style.boxShadow = '0 8px 15px rgba(0,0,0,0.2)';
             }}
-            onClick={() => navigate('/profile-page')}
+            onClick={() => {
+              if(!isProfileComplete) {
+                navigate('/extendedProfile');
+              } else {
+                navigate('/profile-page');
+              }
+            }}
             onMouseLeave={(e) => {
               e.target.style.transform = 'translateY(0)';
               e.target.style.boxShadow = '0 4px 6px rgba(0,0,0,0.1)';
               
             }}>
-              Complete Profile
+              {!isProfileComplete ? 'Update Profile' : 'Complete Profile'}
             </button>
             <button style={{
               padding: '1rem 2rem',

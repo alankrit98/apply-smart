@@ -28,6 +28,7 @@ const Profile = () => {
   const [isLoaded, setIsLoaded] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  const [isProfileComplete, setIsProfileComplete] = useState("");
 
   const navigate = useNavigate();
 
@@ -37,6 +38,30 @@ const Profile = () => {
   const [profileName, setProfileName] = useState("");
   const [resumeFile, setResumeFile] = useState(null);
   const [profile, setProfile] = useState(null);
+
+  useEffect(() => {
+    const fetchUserName = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        if (!token) {
+          console.log('No token found');
+          return;
+        }
+        
+        const res = await axios.get('http://localhost:5000/api/users/profile', {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        
+        setIsProfileComplete(res.data.isProfileComplete);
+      } catch (err) {
+        console.error('Failed to fetch user profile', err);
+      }
+    };
+
+    fetchUserName();
+  }, []);
 
   useEffect(() => {
     setIsLoaded(true);
@@ -445,7 +470,7 @@ const Profile = () => {
               Explore Jobs
             </Link>
             <Link
-              to="resume"
+              to="/resume"
               className="nav-link"
               style={{
                 color: "#374151",
@@ -457,8 +482,7 @@ const Profile = () => {
               Resume Builder
             </Link>
             <Link
-              to="/profile-page"
-              className="nav-link"
+              to= {isProfileComplete ? "/profile-page" : "/extendedProfile"}
               style={{
                 color: "#2563eb",
                 fontWeight: "600",
