@@ -25,7 +25,7 @@ function App() {
         <Route path = "/home" element={<Home />} />
         <Route path="/explore-jobs" element={<ExploreJobs />} />
         <Route path = "/profile-page" element={<Profile />} />
-        <Route path = "/extendedprofile" element = {<ExtendedProfile />} />
+        <Route path = "/extendedProfile" element = {<ExtendedProfile />} />
         <Route path = "/resume" element = {<Resume />} />
         <Route path = "/tracker" element = {<Tracker />} />
       </Routes>

@@ -23,11 +23,18 @@ connectDB();
 // You only need to require your routes once
 const userRoutes = require('./routes/userRoutes');
 const applicationRoutes = require('./routes/applicationRoutes'); // Import the new application routes
+const profileRoutes = require('./routes/profileRoutes');
+const extendedProfileRoutes = require('./routes/extendedProfileRoutes');
 
 app.use('/api/users', userRoutes);
 app.use('/api/applications', applicationRoutes); // Use the new application routes
+app.use('/api/profile', profileRoutes);
+app.use('/api/extendedProfile', extendedProfileRoutes); // Use the extended profile routes
 
 
 // --- Step 6: Start the server ---
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+
+
+console.log("CLOUDINARY_API_KEY:", process.env.CLOUDINARY_API_KEY);

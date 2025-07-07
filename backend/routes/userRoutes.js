@@ -5,6 +5,7 @@ const express = require('express');
 const router = express.Router();
 const authenticateToken = require('../middleware/auth');
 const User = require('../models/User'); // This is the only model you need for signup
+const extendedProfile = require('../models/extendedProfile'); // Import the extended profile model
 
 // Signup Route
 router.post('/signup', async (req, res) => {
@@ -51,7 +52,8 @@ router.get('/profile', authenticateToken, async (req, res) => {
     const user = await User.findById(req.user.id);
     if (!user) return res.status(404).json({ message: 'User not found' });
 
-    res.json({ name: user.name });
+    const isProfileComplete = user.name > 0;
+    res.json({ name: user.name, isProfileComplete });
   } catch (err) {
     res.status(500).json({ message: 'Error fetching profile' });
   }

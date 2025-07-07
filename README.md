@@ -1,70 +1,172 @@
-# Getting Started with Create React App
+# 📝 ApplySmart – Profile & Resume Upload Feature
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Build your professional profile, upload your resume securely via Cloudinary, and store everything seamlessly in MongoDB.
 
-## Available Scripts
+---
 
-In the project directory, you can run:
+## 📌 Project Overview
 
-### `npm start`
+This feature allows users to:
+- Create a **professional profile** with a name and resume (PDF only)
+- Upload resumes securely to **Cloudinary**
+- Store profile metadata (name, resume URL, timestamp) in **MongoDB**
+- Manage UI state dynamically with status badges and UI modals
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+---
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+## ⚙️ Tech Stack
 
-### `npm test`
+| Layer       | Technology                          |
+|-------------|--------------------------------------|
+| Frontend    | React, Axios, React Router, Tailwind |
+| Backend     | Node.js, Express.js, Multer          |
+| Storage     | MongoDB, Cloudinary (Resume Hosting) |
+| Tools       | dotenv, multer-storage-cloudinary    |
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+---
 
-### `npm run build`
+## 🚀 Features
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+- 🎯 Profile creation with status indicator (active/pending)
+- 📄 Resume file upload via Cloudinary
+- 📬 API integration with Axios
+- 📦 MongoDB schema to store profile metadata
+- 🧾 Modal-based resume uploader
+- ⚠️ File validation (PDF only, max 10MB)
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+---
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+## 🧑‍💻 How to Use
 
-### `npm run eject`
+### ✅ 1. Clone the Repo
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+```bash
+git clone https://github.com/your-username/apply-smart.git
+cd apply-smart
+```
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+---
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+### ✅ 2. Set Up Backend
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+#### 🔹 Install dependencies:
 
-## Learn More
+```bash
+cd backend
+npm install
+```
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+#### 🔹 Configure `.env`:
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+```env
+CLOUDINARY_CLOUD_NAME=your_cloud_name
+CLOUDINARY_API_KEY=your_api_key
+CLOUDINARY_API_SECRET=your_api_secret
+MONGO_URI=your_mongodb_connection_string
+PORT=5000
+```
 
-### Code Splitting
+#### 🔹 Start the server:
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+```bash
+node server.js
+```
 
-### Analyzing the Bundle Size
+---
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+### ✅ 3. Set Up Frontend
 
-### Making a Progressive Web App
+#### 🔹 Install dependencies:
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+```bash
+cd frontend
+npm install
+```
 
-### Advanced Configuration
+#### 🔹 Start React app:
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+```bash
+npm run dev
+# or
+npm start
+```
 
-### Deployment
+---
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+## 🧪 API Reference
 
-### `npm run build` fails to minify
+### `POST /api/profile/create`
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+| Field   | Type     | Description          |
+|---------|----------|----------------------|
+| name    | `string` | Profile name         |
+| resume  | `file`   | PDF resume (max 10MB)|
+
+#### ✅ Response:
+
+```json
+{
+  "message": "Profile created",
+  "profile": {
+    "name": "John Doe",
+    "resumeUrl": "https://res.cloudinary.com/...",
+    "createdAt": "2025-07-06T10:00:00.000Z"
+  }
+}
+```
+
+---
+
+## 📂 Folder Structure
+
+```
+apply-smart/
+├── backend/
+│   ├── routes/
+│   │   └── profileRoutes.js
+│   ├── models/
+│   │   └── Profile.js
+│   ├── middleware/
+│   │   └── cloudinaryUpload.js
+│   ├── utils/
+│   │   └── cloudinary.js
+│   └── server.js
+├── frontend/
+│   └── src/pages/
+│       └── Profile.jsx
+└── .env
+```
+
+---
+
+## 🎯 Future Improvements
+
+- [ ] Resume preview/download button
+- [ ] Profile edit/update capability
+- [ ] Resume re-upload feature
+- [ ] Authentication + protected routes
+- [ ] Multi-profile support
+
+---
+
+## 🛡️ Environment Variables
+
+| Variable Name             | Required | Description                        |
+|---------------------------|----------|------------------------------------|
+| CLOUDINARY_CLOUD_NAME     | ✅       | From your Cloudinary dashboard     |
+| CLOUDINARY_API_KEY        | ✅       | Cloudinary API key                 |
+| CLOUDINARY_API_SECRET     | ✅       | Cloudinary API secret              |
+| MONGO_URI                 | ✅       | MongoDB connection URI             |
+| PORT                      | ❌       | Default is 5000                    |
+
+---
+
+## 🤝 Contributing
+
+Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
+
+---
+
+## 📄 License
+
+This project is open-source and available under the [MIT License](LICENSE).
