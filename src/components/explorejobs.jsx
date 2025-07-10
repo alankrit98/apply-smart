@@ -15,7 +15,8 @@ const ExploreJobsPage = () => {
   const [isSearchFocused, setIsSearchFocused] = useState(false);
   const [isLocationFocused, setIsLocationFocused] = useState(false);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
-  const [isProfileComplete, setIsProfileComplete] = useState("");
+  const [isProfileComplete, setIsProfileComplete] = useState(null);
+  const [isProfileLoaded, setIsProfileLoaded] = useState(false);
 
   
 
@@ -193,9 +194,12 @@ const ExploreJobsPage = () => {
           },
         });
 
+        console.log('Fetched data:', res.data);
         setIsProfileComplete(res.data.isProfileComplete);
       } catch (err) {
         console.error('Failed to fetch user profile', err);
+      } finally {
+        setIsProfileLoaded(true);
       }
     };
 
@@ -454,14 +458,14 @@ const ExploreJobsPage = () => {
               textDecoration: 'none',
               paddingBottom: '4px'
             }}>Resume Builder</Link>
-            <Link
-            to ={isProfileComplete ? "/profile-page" : "/extendedProfile"}
+            {isProfileLoaded && (<Link
+            to ={!isProfileComplete ? "/profile-page" : "/extendedProfile"}
              className="nav-link" style={{ 
               color: '#374151', 
               fontWeight: '500', 
               textDecoration: 'none',
               paddingBottom: '4px'
-            }}>Profile</Link>
+            }}>Profile</Link>)}
           </div>
 
           {/* Mobile Menu Button */}

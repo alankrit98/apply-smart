@@ -28,7 +28,7 @@ const Profile = () => {
   const [isLoaded, setIsLoaded] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
-  const [isProfileComplete, setIsProfileComplete] = useState("");
+  const [isProfileComplete, setIsProfileComplete] = useState(false);
 
   const navigate = useNavigate();
 
@@ -482,7 +482,7 @@ const Profile = () => {
               Resume Builder
             </Link>
             <Link
-              to= {isProfileComplete ? "/profile-page" : "/extendedProfile"}
+              to= {!isProfileComplete ? "/profile-page" : "/extendedProfile"}
               style={{
                 color: "#2563eb",
                 fontWeight: "600",

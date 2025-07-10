@@ -6,15 +6,16 @@ const Profile = require('../models/Profile');
 // Create profile with Cloudinary upload
 router.post('/create', upload.single('resume'), async (req, res) => {
   try {
-    const { name } = req.body;
+    const { Pname } = req.body;
     const file = req.file;
 
-    if (!name || !file) {
+    if (!Pname || !file) {
       return res.status(400).json({ message: 'Name and resume are required' });
     }
 
     const profile = new Profile({
-      name,
+      userId: req.user.id,
+      Pname,
       resumeUrl: file.path, // Cloudinary secure URL
     });
 

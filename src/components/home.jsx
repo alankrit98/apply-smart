@@ -9,7 +9,7 @@ import { Bell, User, Search, MapPin, Zap, CheckCircle, AlertCircle, Menu, X } fr
 const ApplySmartHomePage = () => {
   const navigate = useNavigate();
   const [userName, setUserName] = useState("");
-  const [isProfileComplete, setIsProfileComplete] = useState(null);
+  const [isProfileComplete, setIsProfileComplete] = useState(false);
   const [searchField, setSearchField] = useState("");
   const [location, setLocation] = useState("");
   const [hoveredCard, setHoveredCard] = useState(null);
@@ -441,7 +441,7 @@ const ApplySmartHomePage = () => {
               paddingBottom: '4px'
             }}>Resume Builder</Link>
             <Link
-            to = {isProfileComplete ? "/profile-page" : "/extendedProfile"}
+            to = {!isProfileComplete ? "/profile-page" : "/extendedProfile"}
              className="nav-link" style={{ 
               color: '#374151', 
               fontWeight: '500', 
@@ -744,15 +744,15 @@ const ApplySmartHomePage = () => {
           <div style={{ flex: 1 }}>
             <p style={{ fontWeight: '600', fontSize: '18px', margin: 0 }}>
               <span style={{ fontWeight: 'bold' }}>{userName ? userName : 'loading...'},</span> 
-              {isProfileComplete ? " Complete your profile to apply for jobs" : " Welcome back to ApplySmart"}
+              {!isProfileComplete ? " Complete your profile to apply for jobs" : " Welcome back to ApplySmart"}
             </p>
-            {isProfileComplete && (
+            {!isProfileComplete && (
               <p style={{ fontSize: '14px', opacity: 0.8, margin: '4px 0 0 0' }}>
                 Add your skills, experience, and preferences to get better job matches
               </p>
             )}
           </div>
-          {isProfileComplete && (
+          {!isProfileComplete && (
             <button style={{
               padding: '12px 24px',
               backgroundColor: '#f59e0b',
@@ -1334,9 +1334,9 @@ const ApplySmartHomePage = () => {
             }}
             onClick={() => {
               if(!isProfileComplete) {
-                navigate('/extendedProfile');
-              } else {
                 navigate('/profile-page');
+              } else {
+                navigate('/extendedProfile');
               }
             }}
             onMouseLeave={(e) => {
@@ -1344,7 +1344,7 @@ const ApplySmartHomePage = () => {
               e.target.style.boxShadow = '0 4px 6px rgba(0,0,0,0.1)';
               
             }}>
-              {!isProfileComplete ? 'Update Profile' : 'Complete Profile'}
+              {!isProfileComplete ? 'Complete Profile' : 'Update Profile'}
             </button>
             <button style={{
               padding: '1rem 2rem',

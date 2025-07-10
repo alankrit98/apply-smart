@@ -21,7 +21,7 @@ const JobTrackerPage = () => {
   const [selectedJob, setSelectedJob] = useState(null);
   const [showJobDetails, setShowJobDetails] = useState(false);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
-  const [isProfileComplete, setIsProfileComplete] = useState("");
+  const [isProfileComplete, setIsProfileComplete] = useState(false);
 
   // Sample data for different job categories
   const jobData = {
@@ -445,7 +445,7 @@ const JobTrackerPage = () => {
               textDecoration: 'none',
               paddingBottom: '4px'
             }}>Resume Builder</Link>
-            <Link to={isProfileComplete ? "/profile-page" : "/extendedProfile"} className="nav-link" style={{ 
+            <Link to={!isProfileComplete ? "/profile-page" : "/extendedProfile"} className="nav-link" style={{ 
               color: '#374151', 
               fontWeight: '500', 
               textDecoration: 'none',

@@ -35,6 +35,3 @@ app.use('/api/extendedProfile', extendedProfileRoutes); // Use the extended prof
 // --- Step 6: Start the server ---
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
-
-
-console.log("CLOUDINARY_API_KEY:", process.env.CLOUDINARY_API_KEY);

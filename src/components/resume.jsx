@@ -17,7 +17,7 @@ const ResumeBuilderPage = () => {
   const [isJobRoleFocused, setIsJobRoleFocused] = useState(false);
   const [isJobDescFocused, setIsJobDescFocused] = useState(false);
   const [isBuilding, setIsBuilding] = useState(false);
-  const [isProfileComplete, setIsProfileComplete] = useState("");
+  const [isProfileComplete, setIsProfileComplete] = useState(false);
 
   useEffect(() => {
     const fetchUserName = async () => {
@@ -318,7 +318,7 @@ const ResumeBuilderPage = () => {
               textDecoration: 'none',
               paddingBottom: '4px'
             }}>Resume Builder</Link>
-            <Link to={isProfileComplete ? "/profile-page" : "/extendedProfile"} className="nav-link" style={{ 
+            <Link to={!isProfileComplete ? "/profile-page" : "/extendedProfile"} className="nav-link" style={{ 
                 color: '#374151', 
               fontWeight: '500', 
              
