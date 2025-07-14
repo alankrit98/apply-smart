@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from "react";
 import * as bootstrap from "bootstrap";
-import "bootstrap/dist/css/bootstrap.min.css";
+//import "bootstrap/dist/css/bootstrap.min.css";
 // import "bootstrap/dist/js/bootstrap.bundle.min.js"; // 👈 REMOVED: Bootstrap JS is imported and initialized programmatically
 import { Link } from "react-router-dom";
 import "@fortawesome/fontawesome-free/css/all.min.css";

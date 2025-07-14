@@ -6,6 +6,7 @@ const router = express.Router();
 const authenticateToken = require('../middleware/auth');
 const User = require('../models/User'); // This is the only model you need for signup
 const extendedProfile = require('../models/extendedProfile'); // Import the extended profile model
+const Profile = require('../models/Profile'); // Import the basic profile model
 
 // Signup Route
 router.post('/signup', async (req, res) => {
@@ -50,9 +51,13 @@ router.get('/profile', authenticateToken, async (req, res) => {
   console.log(req.user);
   try {
     const user = await User.findById(req.user.id);
+    const basicProfile = await Profile.findOne({ name: user.name });
+    const extProfile = await extendedProfile.findOne({ userId: req.user.id });
     if (!user) return res.status(404).json({ message: 'User not found' });
 
-    const isProfileComplete = user.name > 0;
+    // Profile is complete if user has a basic profile (with resume) OR has name in extended profile
+    const isProfileComplete = (basicProfile && basicProfile.resumeUrl) || 
+                               (extProfile && (extProfile.personalInfo?.firstName || user.name));
     res.json({ name: user.name, isProfileComplete });
   } catch (err) {
     res.status(500).json({ message: 'Error fetching profile' });

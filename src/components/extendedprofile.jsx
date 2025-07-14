@@ -637,7 +637,7 @@ const ProfileDetailsPage = () => {
               textDecoration: 'none',
               paddingBottom: '4px'
             }}>Resume Builder</Link>
-            <Link to={isProfileComplete ? "/profile-page" : "/extendedProfile"} className="nav-link" style={{
+            <Link to="/profile-page" className="nav-link" style={{
               color: '#2563eb',
               fontWeight: '600',
               borderBottom: '2px solid #2563eb',
@@ -742,7 +742,7 @@ const ProfileDetailsPage = () => {
         {/* Back to Profile Button */}
         <div style={{ marginBottom: '40px' }}>
           <Link
-            to={isProfileComplete ? "/profile-page" : "/extendedProfile"}
+            to="/profile-page"
             style={{
               display: 'inline-flex',
               alignItems: 'center',

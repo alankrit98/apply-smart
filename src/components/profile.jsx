@@ -482,7 +482,7 @@ const Profile = () => {
               Resume Builder
             </Link>
             <Link
-              to= {isProfileComplete ? "/profile-page" : "/extendedProfile"}
+              to="/profile-page"
               style={{
                 color: "#2563eb",
                 fontWeight: "600",

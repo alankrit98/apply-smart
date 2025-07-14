@@ -441,7 +441,7 @@ const ApplySmartHomePage = () => {
               paddingBottom: '4px'
             }}>Resume Builder</Link>
             <Link
-            to = {isProfileComplete ? "/profile-page" : "/extendedProfile"}
+            to = "/profile-page"
              className="nav-link" style={{ 
               color: '#374151', 
               fontWeight: '500', 
@@ -744,15 +744,15 @@ const ApplySmartHomePage = () => {
           <div style={{ flex: 1 }}>
             <p style={{ fontWeight: '600', fontSize: '18px', margin: 0 }}>
               <span style={{ fontWeight: 'bold' }}>{userName ? userName : 'loading...'},</span> 
-              {isProfileComplete ? " Complete your profile to apply for jobs" : " Welcome back to ApplySmart"}
-            </p>
-            {isProfileComplete && (
+ {!isProfileComplete ? " Please complete your profile to apply for jobs" : " Welcome back to ApplySmart"}
+             </p>
+            {!isProfileComplete && (
               <p style={{ fontSize: '14px', opacity: 0.8, margin: '4px 0 0 0' }}>
                 Add your skills, experience, and preferences to get better job matches
               </p>
             )}
           </div>
-          {isProfileComplete && (
+          {!isProfileComplete && (
             <button style={{
               padding: '12px 24px',
               backgroundColor: '#f59e0b',
@@ -1332,19 +1332,13 @@ const ApplySmartHomePage = () => {
               e.target.style.transform = 'translateY(-2px)';
               e.target.style.boxShadow = '0 8px 15px rgba(0,0,0,0.2)';
             }}
-            onClick={() => {
-              if(!isProfileComplete) {
-                navigate('/extendedProfile');
-              } else {
-                navigate('/profile-page');
-              }
-            }}
+            onClick={() => navigate('/profile-page')}
             onMouseLeave={(e) => {
               e.target.style.transform = 'translateY(0)';
               e.target.style.boxShadow = '0 4px 6px rgba(0,0,0,0.1)';
               
             }}>
-              {!isProfileComplete ? 'Update Profile' : 'Complete Profile'}
+              {isProfileComplete ? 'Update Profile' : 'Complete Profile'}
             </button>
             <button style={{
               padding: '1rem 2rem',

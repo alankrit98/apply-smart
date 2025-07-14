@@ -445,7 +445,7 @@ const JobTrackerPage = () => {
               textDecoration: 'none',
               paddingBottom: '4px'
             }}>Resume Builder</Link>
-            <Link to={isProfileComplete ? "/profile-page" : "/extendedProfile"} className="nav-link" style={{ 
+            <Link to="/profile-page" className="nav-link" style={{
               color: '#374151', 
               fontWeight: '500', 
               textDecoration: 'none',
