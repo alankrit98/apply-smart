@@ -16,7 +16,9 @@ const app = express();
 // Middleware
 // Configure CORS to allow credentials (cookies) from your frontend origin
 app.use(cors({
-  origin: 'http://localhost:3000', // Replace with your frontend URL in production
+  origin: process.env.NODE_ENV === 'production' 
+    ? 'https://applysmartly.vercel.app' 
+    : 'http://localhost:3000',
   credentials: true // This is crucial for sending/receiving cookies
 }));
 app.use(express.json());
