@@ -36,11 +36,11 @@ const Home = () => {
     const checkProfileStatus = async () => {
       try {
         // First, fetch the user's basic info to get the name
-        const userResponse = await axios.get('http://localhost:5000/api/users/profile');
+        const userResponse = await axios.get('https://apply-smart.onrender.com/api/users/profile');
         setUserName(userResponse.data.name || "User");
         
         // Then fetch the user's profile from the backend
-        const response = await axios.get('http://localhost:5000/api/profile');
+        const response = await axios.get('https://apply-smart.onrender.com/api/profile');
 
         if (response.data.profile) {
           const profile = response.data.profile;
@@ -49,7 +49,7 @@ const Home = () => {
           
           // Check extended profile completion
           try {
-            const extendedRes = await axios.get('http://localhost:5000/api/extended-profile');
+            const extendedRes = await axios.get('https://apply-smart.onrender.com/api/extended-profile');
             const hasExtendedProfile = !!extendedRes.data.personalInfo && !!extendedRes.data.personalInfo.firstName;
             setIsProfileComplete(hasBasicProfile && hasExtendedProfile);
           } catch (extendedError) {

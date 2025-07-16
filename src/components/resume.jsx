@@ -28,7 +28,7 @@ const ResumeBuilderPage = () => {
           return;
         }
 
-        const res = await axios.get('http://localhost:5000/api/users/profile', {
+        const res = await axios.get('https://apply-smart.onrender.com/api/users/profile', {
           headers: {
             Authorization: `Bearer ${token}`,
           },
