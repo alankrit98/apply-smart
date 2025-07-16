@@ -23,52 +23,327 @@ import {
 } from "lucide-react";
 
 const Profile = () => {
-  const [userName, setUserName] = useState("");
+  // Existing UI/Navigation states (from original file)
+  const [userName, setUserName] = useState(""); // This state is not used in the provided logic, keeping for consistency.
   const [showNotifications, setShowNotifications] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
-  const [isProfileComplete, setIsProfileComplete] = useState("");
+  // isProfileComplete state will now be derived from 'profile' state, not localStorage
+  const [isProfileComplete, setIsProfileComplete] = useState(false); 
 
   const navigate = useNavigate();
 
-  // Profile states
-  const [hasProfile, setHasProfile] = useState(false);
-  const [showCreateModal, setShowCreateModal] = useState(false);
-  const [profileName, setProfileName] = useState("");
-  const [resumeFile, setResumeFile] = useState(null);
-  const [profile, setProfile] = useState(null);
+  // Profile data states (from the new logic)
+  const [profile, setProfile] = useState(null); // Stores the fetched profile data
+  const [extendedProfile, setExtendedProfile] = useState(null); // Stores the extended profile data
+  const [loading, setLoading] = useState(true); // Manages loading state for profile fetch
+  const [isEditing, setIsEditing] = useState(false); // Controls whether to show profile view or edit form
+  const [formData, setFormData] = useState({ // Form data for creating/editing profile
+    name: '',
+    email: '',
+    phone: '',
+    experience: '',
+    skills: '',
+    resume: null // Stores the actual File object for upload
+  });
 
+  // Modal specific states (from original file, adapted)
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [modalProfileName, setModalProfileName] = useState(""); // Used only for the initial creation modal
+  const [modalResumeFile, setModalResumeFile] = useState(null); // Used only for the initial creation modal
+
+  // Effect to fetch user name (from original file, keeping for consistency)
+  // This useEffect is separate and might fetch a different 'isProfileComplete' flag
+  // from a different endpoint. For the main profile logic, we'll rely on the 'profile' state.
   useEffect(() => {
-    const fetchUserName = async () => {
-      try {
-        const token = localStorage.getItem('token');
-        if (!token) {
-          console.log('No token found');
-          return;
+    const fetchProfileData = async () => {
+      try { // No need to manually retrieve token from localStorage.
+        // Axios will automatically send the httpOnly cookie.
+        
+        // Fetch user's basic info and profile completeness from /api/users/profile
+        const userRes = await axios.get('http://localhost:5000/api/users/profile');
+        setUserName(userRes.data.name || "User");
+        setIsProfileComplete(userRes.data.isProfileComplete);
+
+        // Fetch comprehensive profile data from /api/profile
+        const profileRes = await axios.get('http://localhost:5000/api/profile');
+        
+        if (profileRes.data.profile) {
+          setProfile(profileRes.data.profile);
+          setFormData({
+            name: profileRes.data.profile.name || '',
+            email: profileRes.data.profile.email || '',
+            phone: profileRes.data.profile.phone || '',
+            experience: profileRes.data.profile.experience || '',
+            skills: profileRes.data.profile.skills || '',
+            resume: null 
+          });
+        } else {
+          setProfile(null);
+        }
+
+        // Fetch extended profile data from /api/extended-profile
+        try {
+          const extendedRes = await axios.get('http://localhost:5000/api/extended-profile');
+          if (extendedRes.data.profile) {
+            setExtendedProfile(extendedRes.data.profile);
+          } else {
+            setExtendedProfile(null);
+          }
+        } catch (extendedError) {
+          if (extendedError.response && extendedError.response.status === 404) {
+            console.log('Extended profile not found for this user.');
+            setExtendedProfile(null);
+          } else {
+            console.error('Failed to fetch extended profile', extendedError);
+            setExtendedProfile(null);
+          }
         }
         
-        const res = await axios.get('http://localhost:5000/api/users/profile', {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        
-        setIsProfileComplete(res.data.isProfileComplete);
-      } catch (err) {
-        console.error('Failed to fetch user profile', err);
+       } catch (error) {
+        console.error('Failed to fetch user profile', error);if (error.response && error.response.status === 401) {
+          // If 401 Unauthorized, it means no valid token (cookie) was sent or it expired
+          console.log('Not authenticated. Redirecting to login.');
+          navigate('/login'); // Redirect to your login page
+        } else if (error.response && error.response.status === 404) {
+          console.log('Profile not found for this user.');
+          setProfile(null);
+          setIsProfileComplete(false); 
+        }
+      } finally {
+        setLoading(false);
       }
     };
 
-    fetchUserName();
+    fetchProfileData();
+  }, [navigate]);
+
+  // Effect to check for existing profile on component mount (from new logic)
+  useEffect(() => {
+    checkExistingProfile();
   }, []);
 
+  // Function to fetch existing profile (from new logic)
+  const checkExistingProfile = async () => {
+    try {
+      const token = localStorage.getItem('token'); // Assuming you have auth token
+      if (!token) {
+        console.log('No token found for profile check. User needs to log in.');
+        setLoading(false);
+        return;
+      }
+
+      // Using a generic /api/profile endpoint for fetching
+      const response = await axios.get('/api/profile', {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      
+      if (response.data.profile) {
+        setProfile(response.data.profile);
+        // Populate formData with existing profile data for editing
+        setFormData({
+          name: response.data.profile.name || '',
+          email: response.data.profile.email || '',
+          phone: response.data.profile.phone || '',
+          experience: response.data.profile.experience || '',
+          skills: response.data.profile.skills || '',
+          resume: null // Resume file is not pre-filled for security/UX reasons
+        });
+        // Profile is considered complete if it exists and has a name and resume URL
+        setIsProfileComplete(!!response.data.profile.name && !!response.data.profile.resumeUrl);
+      } else {
+        // If API returns no profile or an empty profile
+        setProfile(null);
+        setIsProfileComplete(false);
+      }
+    } catch (error) {
+      // If profile not found (e.g., 404), it's not an error in this context, just no profile yet.
+      // Log other errors.
+      if (error.response && error.response.status === 404) {
+        console.log('No existing profile found, user needs to create one.');
+        setProfile(null);
+        setIsProfileComplete(false);
+      } else {
+        console.error('Error checking existing profile:', error);
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Handles form input changes for the main profile form
+ const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  // Handles file input change for the main profile form
+ const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file && file.type === 'application/pdf') {
+      setFormData(prev => ({
+        ...prev,
+        resume: file
+      }));
+    } else {
+      alert('Please select a PDF file');
+      e.target.value = null; // Clear the input
+    }
+  };
+
+  // Main form submission handler for creating/updating profile
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    
+    const formDataToSend = new FormData();
+    formDataToSend.append('name', formData.name);
+    formDataToSend.append('email', formData.email);
+    formDataToSend.append('phone', formData.phone);
+    formDataToSend.append('experience', formData.experience);
+    formDataToSend.append('skills', formData.skills);
+    
+    if (formData.resume) {
+      formDataToSend.append('resume', formData.resume);
+    }
+
+    try {
+      let response;
+      if (profile) {
+        // If profile exists, update it (PUT request)
+        response = await axios.put('http://localhost:5000/api/profile', formDataToSend, { 
+          headers: {
+            'Content-Type': 'multipart/form-data',
+            // No need to manually set Authorization header, cookie is sent automatically
+          }
+        });
+        alert('Profile updated successfully!');
+      } else {
+        // If no profile, create a new one (POST request)
+        response = await axios.post('http://localhost:5000/api/profile', formDataToSend, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+            // No need to manually set Authorization header, cookie is sent automatically
+          }
+        });
+        alert('Profile created successfully!');
+      }
+
+      setProfile(response.data.profile);
+      setIsEditing(false);
+      setIsProfileComplete(!!response.data.profile.name && !!response.data.profile.resumeUrl);
+      
+    } catch (error) {
+      console.error('Error saving profile:', error);
+      if (error.response && error.response.status === 401) {
+        alert('Session expired or not authorized. Please log in again.');
+        navigate('/login');
+      } else {
+        alert('Error saving profile. Please try again.');
+      }
+    }
+  };
+
+  // Function for the file upload in the initial creation modal (from original file)
+  const handleModalFileUpload = (e) => {
+    const file = e.target.files[0];
+    if (file && file.type === 'application/pdf') {
+      setModalResumeFile(file);
+    } else {
+      alert('Please upload a PDF file only');
+      e.target.value = ""; // Clear the input
+    }
+  };
+
+  // Function to handle initial profile creation from the modal (from original file)
+ const handleCreateProfileModal = async () => {
+    if (!modalProfileName.trim() || !modalResumeFile) {
+      alert("Please fill in all fields");
+      return;
+    }
+
+    const formDataModal = new FormData();
+    formDataModal.append("name", modalProfileName);
+    formDataModal.append("resume", modalResumeFile);
+    formDataModal.append("email", formData.email || ''); 
+    formDataModal.append("phone", formData.phone || '');
+    formDataModal.append("experience", formData.experience || '');
+    formDataModal.append("skills", formData.skills || '');
+
+
+    try {
+      const res = await axios.post("http://localhost:5000/api/profile", formDataModal, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+          // No need to manually set Authorization header, cookie is sent automatically
+        },
+      });
+
+      const newProfile = res.data.profile;
+
+      setProfile({
+        name: newProfile.name,
+        email: newProfile.email || '',
+        phone: newProfile.phone || '',
+        experience: newProfile.experience || '',
+        skills: newProfile.skills || '',
+        resumeUrl: newProfile.resumeUrl, 
+      });
+
+      setFormData({
+        name: newProfile.name,
+        email: newProfile.email || '',
+        phone: newProfile.phone || '',
+        experience: newProfile.experience || '',
+        skills: newProfile.skills || '',
+        resume: null 
+      });
+
+      setIsProfileComplete(!!newProfile.name && !!newProfile.resumeUrl);
+      setShowCreateModal(false); 
+      setModalProfileName(""); 
+      setModalResumeFile(null); 
+
+    } catch (error) {
+      console.error("Error creating profile:", error);
+      if (error.response && error.response.status === 401) {
+        alert('Session expired or not authorized. Please log in again.');
+        navigate('/login');
+      } else {
+        alert("Failed to create profile. Try again later.");
+      }
+    }
+  };
+
+  // Function to delete profile (from original file, updated with API call)
+   const handleDeleteProfile = async () => {
+    if (window.confirm("Are you sure you want to delete this profile?")) {
+      try {
+        await axios.delete('http://localhost:5000/api/profile'); 
+        setProfile(null); 
+        setFormData({ 
+          name: '', email: '', phone: '', experience: '', skills: '', resume: null
+        });
+        setIsProfileComplete(false); 
+        alert('Profile deleted successfully!');
+      } catch (error) {
+        console.error('Error deleting profile:', error);
+        if (error.response && error.response.status === 401) {
+          alert('Session expired or not authorized. Please log in again.');
+          navigate('/login');
+        } else {
+          alert('Error deleting profile. Please try again.');
+        }
+      }
+    }
+  };
+
+  // Effect for mouse tracking and initial load animation (from original file)
   useEffect(() => {
     setIsLoaded(true);
-    // Simulate fetching user data
-    // setUserName("John Doe");
-    
-    // Mouse tracking for subtle parallax effects
     const handleMouseMove = (e) => {
       setMousePosition({
         x: (e.clientX / window.innerWidth) * 100,
@@ -80,63 +355,10 @@ const Profile = () => {
     return () => window.removeEventListener("mousemove", handleMouseMove);
   }, []);
 
-  const handleFileUpload = (e) => {
-  const file = e.target.files[0];
-  if (file && file.type === "application/pdf") {
-    setResumeFile(file);
-  } else {
-    alert("Please upload a PDF file only");
-    e.target.value = "";
+  // Show loading indicator
+  if (loading) {
+    return <div className="flex justify-center items-center h-screen text-xl font-semibold text-gray-700">Loading Profile...</div>;
   }
-};
-
-  const handleCreateProfile = async () => {
-  if (!profileName.trim() || !resumeFile) {
-    alert("Please fill in all fields");
-    return;
-  }
-
-  const formData = new FormData();
-  formData.append("name", profileName);
-  formData.append("resume", resumeFile);
-
-  try {
-    const res = await axios.post("http://localhost:5000/api/profile/create", formData, {
-      headers: {
-        "Content-Type": "multipart/form-data",
-      },
-    });
-
-    const newProfile = res.data.profile;
-
-    setProfile({
-      name: newProfile.name,
-      resume: newProfile.resumeUrl.split("/").pop(), // show only file name
-      createdAt: new Date(newProfile.createdAt).toLocaleDateString(),
-    });
-
-    setHasProfile(true);
-    setShowCreateModal(false);
-    setProfileName("");
-    setResumeFile(null);
-
-    navigate("/extendedprofile");
-  } catch (error) {
-    console.error("Error creating profile:", error);
-    alert("Failed to create profile. Try again later.");
-  }
-};
-
-  const handleDeleteProfile = () => {
-    if (window.confirm("Are you sure you want to delete this profile?")) {
-      setProfile(null);
-      setHasProfile(false);
-    }
-  };
-
-  const handleUpdateProfile = () => {
-    alert("Update functionality will be implemented to edit profile details.");
-  };
 
   return (
     <div
@@ -457,7 +679,7 @@ const Profile = () => {
               Application Tracker
             </Link>
             <Link
-              to="/explore-jobs" // 2. Use the 'to' prop to specify the destination
+              to="/explore-jobs"
               className="nav-link"
               style={{
                 color: "#374151",
@@ -586,8 +808,8 @@ const Profile = () => {
             <div
               style={{ display: "flex", flexDirection: "column", gap: "16px" }}
             >
-              <a
-                href="#"
+              <Link
+                to="/home"
                 style={{
                   color: "#374151",
                   fontWeight: "500",
@@ -595,9 +817,9 @@ const Profile = () => {
                 }}
               >
                 Home
-              </a>
-              <a
-                href="#"
+              </Link>
+              <Link
+                to="/tracker"
                 style={{
                   color: "#374151",
                   fontWeight: "500",
@@ -605,9 +827,9 @@ const Profile = () => {
                 }}
               >
                 Application Tracker
-              </a>
-              <a
-                href="#"
+              </Link>
+              <Link
+                to="/explore-jobs"
                 style={{
                   color: "#374151",
                   fontWeight: "500",
@@ -615,9 +837,9 @@ const Profile = () => {
                 }}
               >
                 Explore Jobs
-              </a>
-              <a
-                href="#"
+              </Link>
+              <Link
+                to="/resume"
                 style={{
                   color: "#374151",
                   fontWeight: "500",
@@ -625,9 +847,9 @@ const Profile = () => {
                 }}
               >
                 Resume Builder
-              </a>
-              <a
-                href="#"
+              </Link>
+              <Link
+                to="/profile-page"
                 style={{
                   color: "#2563eb",
                   fontWeight: "600",
@@ -635,7 +857,7 @@ const Profile = () => {
                 }}
               >
                 Profile
-              </a>
+              </Link>
             </div>
           </div>
         )}
@@ -771,10 +993,10 @@ const Profile = () => {
 
           <div
             className={`status-badge ${
-              hasProfile ? "status-complete" : "status-pending"
+              isProfileComplete ? "status-complete" : "status-pending"
             }`}
           >
-            {hasProfile ? (
+            {isProfileComplete ? (
               <>
                 <CheckCircle size={16} />
                 Profile Active & Ready
@@ -788,7 +1010,7 @@ const Profile = () => {
           </div>
         </div>
 
-        {/* Profile Section */}
+        {/* Profile Section - Conditional Rendering */}
         <div
           style={{
             transform: isLoaded ? "translateY(0)" : "translateY(32px)",
@@ -797,96 +1019,8 @@ const Profile = () => {
           }}
         >
           <div style={{ maxWidth: "700px", margin: "0 auto" }}>
-            {!hasProfile ? (
-              // Add Profile Card
-              <div
-                className="add-profile-card"
-                onClick={() => setShowCreateModal(true)}
-              >
-                <div
-                  style={{
-                    width: "100px",
-                    height: "100px",
-                    background: "linear-gradient(135deg, #2563eb, #7c3aed)",
-                    borderRadius: "50%",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    marginBottom: "24px",
-                    transition: "all 0.3s ease",
-                    boxShadow: "0 20px 25px -5px rgba(37, 99, 235, 0.3)",
-                  }}
-                  className="floating-icon"
-                >
-                  <Plus size={48} color="white" />
-                </div>
-                <h3
-                  style={{
-                    fontSize: "28px",
-                    fontWeight: "700",
-                    color: "#0f172a",
-                    marginBottom: "12px",
-                    letterSpacing: "-0.025em",
-                  }}
-                >
-                  Create Your Professional Profile
-                </h3>
-                <p
-                  style={{
-                    fontSize: "18px",
-                    color: "#64748b",
-                    margin: "0 0 20px 0",
-                    lineHeight: "1.6",
-                  }}
-                >
-                  Upload your resume and build a comprehensive profile to get
-                  discovered by top employers
-                </p>
-                <div
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    gap: "24px",
-                    marginTop: "20px",
-                    fontSize: "14px",
-                    color: "#64748b",
-                  }}
-                >
-                  <div
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: "8px",
-                    }}
-                  >
-                    <Upload size={16} />
-                    <span>Upload Resume</span>
-                  </div>
-                  <div
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: "8px",
-                    }}
-                  >
-                    <Award size={16} />
-                    <span>Add Skills</span>
-                  </div>
-                  <div
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: "8px",
-                    }}
-                  >
-                    <Zap size={16} />
-                    <span>Get Matched</span>
-                  </div>
-                </div>
-              </div>
-            ) : (
-              // Existing Profile Card
+            {/* If profile exists and not editing, show profile view */}
+            {profile && !isEditing ? (
               <div className="profile-card">
                 <div
                   style={{
@@ -957,7 +1091,7 @@ const Profile = () => {
                               fontWeight: "500",
                             }}
                           >
-                            {profile?.resume}
+                            {profile?.resumeUrl ? profile.resumeUrl.split("/").pop() : 'No Resume'}
                           </span>
                         </div>
                       </div>
@@ -968,7 +1102,6 @@ const Profile = () => {
                           margin: 0,
                         }}
                       >
-                        Created on {profile?.createdAt}
                       </p>
                     </div>
                   </div>
@@ -977,7 +1110,7 @@ const Profile = () => {
                     style={{ display: "flex", gap: "12px", flexWrap: "wrap" }}
                   >
                     <button
-                      onClick={handleUpdateProfile}
+                      onClick={() => navigate('/extendedProfile')} // Redirect to extended profile
                       style={{
                         padding: "12px 20px",
                         background: "linear-gradient(135deg, #2563eb, #4f46e5)",
@@ -995,7 +1128,7 @@ const Profile = () => {
                       }}
                     >
                       <Edit size={16} />
-                      Update Profile
+                      Edit Profile
                     </button>
                     <button
                       onClick={handleDeleteProfile}
@@ -1020,64 +1153,252 @@ const Profile = () => {
                   </div>
                 </div>
 
+               
+
+               
+                {profile.resumeUrl && (
+                  <div style={{ marginTop: "24px" }}>
+                    <label className="block text-sm font-medium text-gray-600">Resume</label>
+                    <a 
+                      href={profile.resumeUrl} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="text-blue-500 hover:text-blue-700 underline"
+                    >
+                      View Resume
+                    </a>
+                  </div>
+                )}
+
+
+              </div>
+            ) : (
+              // If no profile exists AND not in editing mode, show the "Add Profile" card
+              // Otherwise (if profile exists AND in editing mode), show the main form
+              profile === null && !isEditing ? (
+                // Add Profile Card (only shown if no profile exists and not editing)
                 <div
-                  style={{
-                    padding: "24px",
-                    background: "linear-gradient(135deg, #f8fafc, #f1f5f9)",
-                    borderRadius: "16px",
-                    border: "1px solid #e2e8f0",
-                  }}
+                  className="add-profile-card"
+                  onClick={() => setShowCreateModal(true)}
                 >
+                  <div
+                    style={{
+                      width: "100px",
+                      height: "100px",
+                      background: "linear-gradient(135deg, #2563eb, #7c3aed)",
+                      borderRadius: "50%",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      marginBottom: "24px",
+                      transition: "all 0.3s ease",
+                      boxShadow: "0 20px 25px -5px rgba(37, 99, 235, 0.3)",
+                    }}
+                    className="floating-icon"
+                  >
+                    <Plus size={48} color="white" />
+                  </div>
+                  <h3
+                    style={{
+                      fontSize: "28px",
+                      fontWeight: "700",
+                      color: "#0f172a",
+                      marginBottom: "12px",
+                      letterSpacing: "-0.025em",
+                    }}
+                  >
+                    Create Your Professional Profile
+                  </h3>
+                  <p
+                    style={{
+                      fontSize: "18px",
+                      color: "#64748b",
+                      margin: "0 0 20px 0",
+                      lineHeight: "1.6",
+                    }}
+                  >
+                    Upload your resume and build a comprehensive profile to get
+                    discovered by top employers
+                  </p>
                   <div
                     style={{
                       display: "flex",
                       alignItems: "center",
-                      justifyContent: "space-between",
-                      flexWrap: "wrap",
-                      gap: "16px",
+                      justifyContent: "center",
+                      gap: "24px",
+                      marginTop: "20px",
+                      fontSize: "14px",
+                      color: "#64748b",
                     }}
                   >
-                    <div>
-                      <h4
-                        style={{
-                          fontSize: "16px",
-                          fontWeight: "600",
-                          color: "#0f172a",
-                          margin: "0 0 4px 0",
-                        }}
-                      >
-                        Profile Status
-                      </h4>
-                      <p
-                        style={{
-                          fontSize: "14px",
-                          color: "#64748b",
-                          margin: 0,
-                        }}
-                      >
-                        Your profile is active and visible to employers
-                      </p>
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "8px",
+                      }}
+                    >
+                      <Upload size={16} />
+                      <span>Upload Resume</span>
                     </div>
                     <div
                       style={{
                         display: "flex",
+                        alignItems: "center",
                         gap: "8px",
                       }}
                     >
-                      <CheckCircle size={18} color="#059669" />
-                      <span
-                        style={{
-                          fontSize: "14px",
-                          fontWeight: "600",
-                          color: "#059669",
-                        }}
-                      >
-                        Active
-                      </span>
+                      <Award size={16} />
+                      <span>Add Skills</span>
+                    </div>
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "8px",
+                      }}
+                    >
+                      <Zap size={16} />
+                      <span>Get Matched</span>
                     </div>
                   </div>
                 </div>
-              </div>
+              ) : (
+                // Show form for creating/editing profile
+                <div className="max-w-4xl mx-auto p-6">
+                  <div className="bg-white rounded-lg shadow-lg p-8">
+                    <h1 className="text-3xl font-bold text-gray-800 mb-6">
+                      {profile ? 'Edit Profile' : 'Create Your Profile'}
+                    </h1>
+
+                    <form onSubmit={handleSubmit} className="space-y-6">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Name *
+                          </label>
+                          <input
+                            type="text"
+                            name="name"
+                            value={formData.name}
+                            onChange={handleInputChange}
+                            required
+                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Email *
+                          </label>
+                          <input
+                            type="email"
+                            name="email"
+                            value={formData.email}
+                            onChange={handleInputChange}
+                            required
+                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Phone
+                          </label>
+                          <input
+                            type="tel"
+                            name="phone"
+                            value={formData.phone}
+                            onChange={handleInputChange}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Resume (PDF only) {profile ? '' : '*'}
+                          </label>
+                          <input
+                            type="file"
+                            accept=".pdf"
+                            onChange={handleFileChange}
+                            required={!profile} 
+                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          />
+                          {profile?.resumeUrl && !formData.resume && (
+                            <p className="text-sm text-gray-500 mt-1">
+                              Current resume: <a href={profile.resumeUrl} target="_blank" rel="noopener noreferrer" className="text-blue-500 underline">{profile.resumeUrl.split('/').pop()}</a> (Upload new to replace)
+                            </p>
+                          )}
+                          {formData.resume && (
+                            <p className="text-sm text-gray-500 mt-1">
+                              New resume selected: {formData.resume.name}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Work Experience
+                        </label>
+                        <textarea
+                          name="experience"
+                          value={formData.experience}
+                          onChange={handleInputChange}
+                          rows="4"
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          placeholder="Describe your work experience..."
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Skills
+                        </label>
+                        <textarea
+                          name="skills"
+                          value={formData.skills}
+                          onChange={handleInputChange}
+                          rows="3"
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          placeholder="List your skills..."
+                        />
+                      </div>
+
+                      <div className="flex gap-4">
+                        <button
+                          type="submit"
+                          className="bg-blue-500 text-white px-6 py-2 rounded-lg hover:bg-blue-600 transition-colors"
+                        >
+                          {profile ? 'Update Profile' : 'Save Profile'}
+                        </button>
+                        
+                        {profile && ( // Show cancel button only if editing an existing profile
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setIsEditing(false);
+                              // Reset formData to current profile data if cancelling edit
+                              setFormData({
+                                name: profile.name || '',
+                                email: profile.email || '',
+                                phone: profile.phone || '',
+                                experience: profile.experience || '',
+                                skills: profile.skills || '',
+                                resume: null
+                              });
+                            }}
+                            className="bg-gray-500 text-white px-6 py-2 rounded-lg hover:bg-gray-600 transition-colors"
+                          >
+                            Cancel
+                          </button>
+                        )}
+                      </div>
+                    </form>
+                  </div>
+                </div>
+              )
             )}
           </div>
         </div>
@@ -1373,8 +1694,8 @@ const Profile = () => {
               </label>
               <input
                 type="text"
-                value={profileName}
-                onChange={(e) => setProfileName(e.target.value)}
+                value={modalProfileName}
+                onChange={(e) => setModalProfileName(e.target.value)}
                 placeholder="Enter your professional name"
                 style={{
                   width: "100%",
@@ -1417,7 +1738,7 @@ const Profile = () => {
                 <input
                   type="file"
                   accept=".pdf"
-                  onChange={handleFileUpload}
+                  onChange={handleModalFileUpload}
                   style={{
                     position: "absolute",
                     top: 0,
@@ -1440,8 +1761,8 @@ const Profile = () => {
                     margin: "0 0 8px 0",
                   }}
                 >
-                  {resumeFile
-                    ? resumeFile.name
+                  {modalResumeFile
+                    ? modalResumeFile.name
                     : "Click to upload or drag and drop"}
                 </p>
                 <p
@@ -1480,7 +1801,7 @@ const Profile = () => {
                 Cancel
               </button>
               <button
-                onClick={handleCreateProfile}
+                onClick={handleCreateProfileModal}
                 style={{
                   padding: "14px 32px",
                   background: "linear-gradient(135deg, #2563eb, #4f46e5)",

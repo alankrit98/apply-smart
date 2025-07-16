@@ -1,15 +1,21 @@
-import jwt_decode from "jwt-decode";
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom'; 
-import { Briefcase, Users, Star, TrendingUp } from 'lucide-react';
-import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
-import { Bell, User, Search, MapPin, Zap, CheckCircle, AlertCircle, Menu, X } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import axios from 'axios'; 
+import { useNavigate } from 'react-router-dom'; 
+import { CheckCircle, AlertCircle } from 'lucide-react'; 
+import { Bell, User, Search, MapPin, Zap, Menu, X } from 'lucide-react'; // Added missing imports from original home.jsx
+import { Briefcase, Users, Star, TrendingUp } from 'lucide-react'; // Added missing imports from original home.jsx
 
-const ApplySmartHomePage = () => {
+// Configure axios globally to send cookies with requests
+axios.defaults.withCredentials = true;
+
+const Home = () => {
   const navigate = useNavigate();
-  const [userName, setUserName] = useState("");
-  const [isProfileComplete, setIsProfileComplete] = useState(null);
+  const [userName, setUserName] = useState("User"); 
+  const [isProfileComplete, setIsProfileComplete] = useState(false); 
+  const [loading, setLoading] = useState(true);
+
+  // Added states from your original home.jsx that were missing in the previous update
   const [searchField, setSearchField] = useState("");
   const [location, setLocation] = useState("");
   const [hoveredCard, setHoveredCard] = useState(null);
@@ -24,31 +30,55 @@ const ApplySmartHomePage = () => {
   const [isSearchFocused, setIsSearchFocused] = useState(false);
   const [isLocationFocused, setIsLocationFocused] = useState(false);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+
+
   useEffect(() => {
-    const fetchUserName = async () => {
+    const checkProfileStatus = async () => {
       try {
-        const token = localStorage.getItem('token');
-        if (!token) {
-          console.log('No token found');
-          return;
+        // First, fetch the user's basic info to get the name
+        const userResponse = await axios.get('http://localhost:5000/api/users/profile');
+        setUserName(userResponse.data.name || "User");
+        
+        // Then fetch the user's profile from the backend
+        const response = await axios.get('http://localhost:5000/api/profile');
+
+        if (response.data.profile) {
+          const profile = response.data.profile;
+          // Check if profile has both name and resumeUrl
+          const hasBasicProfile = !!profile.name && !!profile.resumeUrl;
+          
+          // Check extended profile completion
+          try {
+            const extendedRes = await axios.get('http://localhost:5000/api/extended-profile');
+            const hasExtendedProfile = !!extendedRes.data.personalInfo && !!extendedRes.data.personalInfo.firstName;
+            setIsProfileComplete(hasBasicProfile && hasExtendedProfile);
+          } catch (extendedError) {
+            console.log('Extended profile not found');
+            setIsProfileComplete(false);
+          }
+        } else {
+          // No profile found
+          setIsProfileComplete(false);
         }
-        
-        const res = await axios.get('http://localhost:5000/api/users/profile', {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        
-        setUserName(res.data.name); // Set the name to state
-        setIsProfileComplete(res.data.isProfileComplete);
-      } catch (err) {
-        console.error('Failed to fetch user profile', err);
+      } catch (error) {
+        console.error('Error checking profile status:', error);
+        if (error.response && error.response.status === 401) {
+          console.log('Not authenticated. Redirecting to login.');
+          // navigate('/login'); // Uncomment if you want to force login
+        } else if (error.response && error.response.status === 404) {
+          setIsProfileComplete(false);
+        } else {
+          setIsProfileComplete(false);
+        }
+      } finally {
+        setLoading(false);
       }
     };
 
-    fetchUserName();
+    checkProfileStatus();
   }, []);
 
+  // Existing useEffect for animations and mouse tracking from your original home.jsx
   useEffect(() => {
     setIsLoaded(true);
 
@@ -77,8 +107,6 @@ const ApplySmartHomePage = () => {
     
     setTimeout(animateStats, 1000);
   
-
-    
     // Mouse tracking for subtle parallax effects
     const handleMouseMove = (e) => {
       setMousePosition({
@@ -181,6 +209,14 @@ const ApplySmartHomePage = () => {
       features: ['Job Search', 'Resume Builder', 'Company Research']
     }
   ];
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-100 flex flex-col items-center justify-center p-4">
+        <p className="text-xl text-gray-700">Loading profile status...</p>
+      </div>
+    );
+  }
 
   return (
     <div style={{
@@ -552,11 +588,11 @@ const ApplySmartHomePage = () => {
             animation: 'slideDown 0.3s ease'
           }}>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-              <a href="#" style={{ color: '#2563eb', fontWeight: '600', textDecoration: 'none' }}>Home</a>
-              <a href="#" style={{ color: '#374151', fontWeight: '500', textDecoration: 'none' }}>Application Tracker</a>
-              <a href="#" style={{ color: '#374151', fontWeight: '500', textDecoration: 'none' }}>Explore Jobs</a>
-              <a href="#" style={{ color: '#374151', fontWeight: '500', textDecoration: 'none' }}>Resume Builder</a>
-              <a href="#" style={{ color: '#374151', fontWeight: '500', textDecoration: 'none' }}>Profile</a>
+              <Link to="/home" style={{ color: '#2563eb', fontWeight: '600', textDecoration: 'none' }}>Home</Link>
+              <Link to="/tracker" style={{ color: '#374151', fontWeight: '500', textDecoration: 'none' }}>Application Tracker</Link>
+              <Link to="/explore-jobs" style={{ color: '#374151', fontWeight: '500', textDecoration: 'none' }}>Explore Jobs</Link>
+              <Link to="/resume" style={{ color: '#374151', fontWeight: '500', textDecoration: 'none' }}>Resume Builder</Link>
+              <Link to="/profile-page" style={{ color: '#374151', fontWeight: '500', textDecoration: 'none' }}>Profile</Link>
             </div>
           </div>
         )}
@@ -744,8 +780,8 @@ const ApplySmartHomePage = () => {
           <div style={{ flex: 1 }}>
             <p style={{ fontWeight: '600', fontSize: '18px', margin: 0 }}>
               <span style={{ fontWeight: 'bold' }}>{userName ? userName : 'loading...'},</span> 
- {!isProfileComplete ? " Please complete your profile to apply for jobs" : " Welcome back to ApplySmart"}
-             </p>
+              {isProfileComplete ? " your profile is complete!" : " please complete your profile."}
+            </p>
             {!isProfileComplete && (
               <p style={{ fontSize: '14px', opacity: 0.8, margin: '4px 0 0 0' }}>
                 Add your skills, experience, and preferences to get better job matches
@@ -1393,4 +1429,4 @@ const ApplySmartHomePage = () => {
   );
 };
 
-export default ApplySmartHomePage;
+export default Home;

@@ -246,65 +246,52 @@ const ProfileDetailsPage = () => {
   const [achievements, setAchievements] = useState([]);
   const [isProfileComplete, setIsProfileComplete] = useState("");
 
-  const token = localStorage.getItem('token');
+  // Configure axios to send cookies
+  axios.defaults.withCredentials = true;
 
   useEffect(() => {
     const fetchUserName = async () => {
       try {
-        const token = localStorage.getItem('token');
-        if (!token) {
-          console.log('No token found');
-          return;
-        }
-
-        const res = await axios.get('http://localhost:5000/api/users/profile', {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-
+        const res = await axios.get('http://localhost:5000/api/users/profile');
         setIsProfileComplete(res.data.isProfileComplete);
       } catch (err) {
         console.error('Failed to fetch user profile', err);
+        if (err.response && err.response.status === 401) {
+          navigate('/login');
+        }
       }
     };
 
     fetchUserName();
-  }, []);
+  }, [navigate]);
 
   useEffect(() => {
-  const fetchExtendedProfile = async () => {
-    try {
-      const token = localStorage.getItem('token'); // or wherever you store it
-
-      const res = await fetch('http://localhost:5000/api/extendedProfile', {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
+    const fetchExtendedProfile = async () => {
+      try {
+        const res = await axios.get('http://localhost:5000/api/extended-profile');
+        
+        if (res.data) {
+          setPersonalInfo(res.data.personalInfo || {});
+          setJobPreference(res.data.jobPreference || {});
+          setWorkExperience(res.data.workExperience || []);
+          setEducation(res.data.education || []);
+          setSkills(res.data.skills || []);
+          setLanguages(res.data.languages || []);
+          setCertifications(res.data.certifications || []);
+          setAchievements(res.data.achievements || []);
         }
-      });
-
-      const data = await res.json();
-      if (res.ok) {
-        setPersonalInfo(data.personalInfo || {});
-      setJobPreference(data.jobPreference || {});
-      setWorkExperience(data.workExperience || []);
-      setEducation(data.education || []);
-      setSkills(data.skills || []);
-      setLanguages(data.languages || []);
-      setCertifications(data.certifications || []);
-      setAchievements(data.achievements || []);
-      } else {
-        console.error('Error fetching profile:', data.message);
+      } catch (error) {
+        console.error('Error fetching extended profile:', error);
+        if (error.response && error.response.status === 404) {
+          console.log('No extended profile found yet');
+        } else if (error.response && error.response.status === 401) {
+          navigate('/login');
+        }
       }
-    } catch (error) {
-      console.error('Error:', error);
-    }
-  };
+    };
 
-  fetchExtendedProfile();
-}, []);
+    fetchExtendedProfile();
+  }, [navigate]);
 
   useEffect(() => {
     let ticking = false;
@@ -361,14 +348,8 @@ const ProfileDetailsPage = () => {
   };
 
   const handleSaveProfile = async () => {
-  try {
-    const res = await fetch('http://localhost:5000/api/extendedProfile/save', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-      },
-      body: JSON.stringify({
+    try {
+      const res = await axios.post('http://localhost:5000/api/extended-profile/save', {
         personalInfo,
         jobPreference,
         workExperience,
@@ -377,21 +358,24 @@ const ProfileDetailsPage = () => {
         languages,
         certifications,
         achievements
-      })
-    });
+      });
 
-    const data = await res.json();
-    if (res.ok) {
-      alert('Profile saved!');
-      navigate('/home');
-    } else {
-      alert('Error saving profile: ' + data.message);
+      if (res.status === 200 || res.status === 201) {
+        alert('Profile saved successfully!');
+        navigate('/home');
+      }
+    } catch (err) {
+      console.error('Error saving profile:', err);
+      if (err.response && err.response.data && err.response.data.message) {
+        alert('Error saving profile: ' + err.response.data.message);
+      } else if (err.response && err.response.status === 401) {
+        alert('Authentication error. Please login again.');
+        navigate('/login');
+      } else {
+        alert('Network error occurred while saving profile');
+      }
     }
-  } catch (err) {
-    console.error(err);
-    alert('Network error');
-  }
-};
+  };
 
   const addWorkExperience = () => {
     setWorkExperience([...workExperience, {
