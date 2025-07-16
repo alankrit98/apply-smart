@@ -62,12 +62,12 @@ const Profile = () => {
         // Axios will automatically send the httpOnly cookie.
         
         // Fetch user's basic info and profile completeness from /api/users/profile
-        const userRes = await axios.get('https://apply-smart.onrender.com/api/users/profile');
+        const userRes = await axios.get('http://localhost:5000/api/users/profile');
         setUserName(userRes.data.name || "User");
         setIsProfileComplete(userRes.data.isProfileComplete);
 
         // Fetch comprehensive profile data from /api/profile
-        const profileRes = await axios.get('https://apply-smart.onrender.com/api/profile');
+        const profileRes = await axios.get('http://localhost:5000/api/profile');
         
         if (profileRes.data.profile) {
           setProfile(profileRes.data.profile);
@@ -85,7 +85,7 @@ const Profile = () => {
 
         // Fetch extended profile data from /api/extended-profile
         try {
-          const extendedRes = await axios.get('https://apply-smart.onrender.com/api/extended-profile');
+          const extendedRes = await axios.get('http://localhost:5000/api/extended-profile');
           if (extendedRes.data.profile) {
             setExtendedProfile(extendedRes.data.profile);
           } else {
@@ -214,7 +214,7 @@ const Profile = () => {
       let response;
       if (profile) {
         // If profile exists, update it (PUT request)
-        response = await axios.put('https://apply-smart.onrender.com/api/profile', formDataToSend, {
+        response = await axios.put('http://localhost:5000/api/profile', formDataToSend, { 
           headers: {
             'Content-Type': 'multipart/form-data',
             // No need to manually set Authorization header, cookie is sent automatically
@@ -223,7 +223,7 @@ const Profile = () => {
         alert('Profile updated successfully!');
       } else {
         // If no profile, create a new one (POST request)
-        response = await axios.post('https://apply-smart.onrender.com/api/profile', formDataToSend, {
+        response = await axios.post('http://localhost:5000/api/profile', formDataToSend, {
           headers: {
             'Content-Type': 'multipart/form-data',
             // No need to manually set Authorization header, cookie is sent automatically
@@ -275,7 +275,7 @@ const Profile = () => {
 
 
     try {
-      const res = await axios.post("https://apply-smart.onrender.com/api/profile", formDataModal, {
+      const res = await axios.post("http://localhost:5000/api/profile", formDataModal, {
         headers: {
           "Content-Type": "multipart/form-data",
           // No need to manually set Authorization header, cookie is sent automatically
@@ -322,7 +322,7 @@ const Profile = () => {
    const handleDeleteProfile = async () => {
     if (window.confirm("Are you sure you want to delete this profile?")) {
       try {
-        await axios.delete('https://apply-smart.onrender.com/api/profile');
+        await axios.delete('http://localhost:5000/api/profile'); 
         setProfile(null); 
         setFormData({ 
           name: '', email: '', phone: '', experience: '', skills: '', resume: null

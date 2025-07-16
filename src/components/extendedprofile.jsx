@@ -252,7 +252,7 @@ const ProfileDetailsPage = () => {
   useEffect(() => {
     const fetchUserName = async () => {
       try {
-        const res = await axios.get('https://apply-smart.onrender.com/api/users/profile');
+        const res = await axios.get('https://localhost:5000/api/users/profile');
         setIsProfileComplete(res.data.isProfileComplete);
       } catch (err) {
         console.error('Failed to fetch user profile', err);
@@ -268,7 +268,7 @@ const ProfileDetailsPage = () => {
   useEffect(() => {
     const fetchExtendedProfile = async () => {
       try {
-        const res = await axios.get('https://apply-smart.onrender.com/api/extended-profile');
+        const res = await axios.get('https://localhost:5000/api/extended-profile');
         
         if (res.data) {
           setPersonalInfo(res.data.personalInfo || {});
@@ -349,7 +349,7 @@ const ProfileDetailsPage = () => {
 
   const handleSaveProfile = async () => {
     try {
-      const res = await axios.post('https://apply-smart.onrender.com/api/extended-profile/save', {
+      const res = await axios.post('https://localhost:5000/api/extended-profile/save', {
         personalInfo,
         jobPreference,
         workExperience,

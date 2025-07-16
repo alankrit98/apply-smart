@@ -26,7 +26,7 @@ const LoginSignup = () => {
 
     try {
       // Removed localStorage logic and replaced it with API call
-      const response = await axios.post('https://apply-smart.onrender.com/api/users/signup', {
+      const response = await axios.post('http://localhost:5000/api/users/signup', {
         name: formData.name,
         email: formData.email,
         password: formData.password,
@@ -46,7 +46,7 @@ const LoginSignup = () => {
 
     try {
       // Removed localStorage logic and replaced it with API call
-      const response = await axios.post('https://apply-smart.onrender.com/api/users/login', {
+      const response = await axios.post('http://localhost:5000/api/users/login', {
         email: formData.email,
         password: formData.password,
       });

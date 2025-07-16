@@ -180,7 +180,7 @@ const JobTrackerPage = () => {
           return;
         }
 
-        const res = await axios.get('https://apply-smart.onrender.com/api/users/profile', {
+        const res = await axios.get('https://localhost:5000/api/users/profile', {
           headers: {
             Authorization: `Bearer ${token}`,
           },
