@@ -54,10 +54,24 @@ const ApplyForm = () => {
       return;
     }
 
+    // Enhanced debugging: Log form data before submission
+    console.log('Form data being submitted:', formData);
+    console.log('Form data keys:', Object.keys(formData));
+    console.log('Form data values:', Object.values(formData));
+
     setMessage('Submitting application...'); // Provide feedback to the user
     try {
       // Send the formData to your new backend API endpoint
-      const response = await axios.post('http://localhost:5000/api/applications/submit', formData);
+      const response = await axios.post('https://localhost:5000/api/application/submit', formData, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        withCredentials: true
+      });
+
+      console.log('Response received:', response);
+      console.log('Response status:', response.status);
+      console.log('Response data:', response.data);
 
       if (response.status === 201) {
         setMessage('Application submitted successfully!');
@@ -75,9 +89,22 @@ const ApplyForm = () => {
         navigate('/login-signup'); // Navigate to login/signup after successful submission
       }
     } catch (error) {
-      console.error('Error submitting application:', error);
-      // Display a user-friendly error message
-      setMessage(error.response?.data?.message || 'Failed to submit application. Please try again.');
+      console.error('Full error object:', error);
+      console.error('Error message:', error.message);
+      console.error('Error response:', error.response);
+      
+      if (error.response) {
+        console.error('Response status:', error.response.status);
+        console.error('Response headers:', error.response.headers);
+        console.error('Response data:', error.response.data);
+        setMessage(`Error ${error.response.status}: ${error.response.data?.message || error.response.statusText}`);
+      } else if (error.request) {
+        console.error('Request made but no response received:', error.request);
+        setMessage('No response from server. Please check if the backend is running.');
+      } else {
+        console.error('Error setting up request:', error.message);
+        setMessage('Request setup error: ' + error.message);
+      }
     }
   };
 

@@ -28,7 +28,7 @@ const ResumeBuilderPage = () => {
           return;
         }
 
-        const res = await axios.get('http://localhost:5000/api/users/profile', {
+        const res = await axios.get('https://localhost:5000/api/users/profile', {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -318,7 +318,7 @@ const ResumeBuilderPage = () => {
               textDecoration: 'none',
               paddingBottom: '4px'
             }}>Resume Builder</Link>
-            <Link to={!isProfileComplete ? "/profile-page" : "/extendedProfile"} className="nav-link" style={{ 
+            <Link to="/profile-page" className="nav-link" style={{
                 color: '#374151', 
               fontWeight: '500', 
              

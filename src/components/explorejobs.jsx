@@ -188,7 +188,7 @@ const ExploreJobsPage = () => {
           return;
         }
 
-        const res = await axios.get('http://localhost:5000/api/users/profile', {
+        const res = await axios.get('https://localhost:5000/api/users/profile', {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -458,8 +458,8 @@ const ExploreJobsPage = () => {
               textDecoration: 'none',
               paddingBottom: '4px'
             }}>Resume Builder</Link>
-            {isProfileLoaded && (<Link
-            to ={!isProfileComplete ? "/profile-page" : "/extendedProfile"}
+            <Link
+            to ="/profile-page"
              className="nav-link" style={{ 
               color: '#374151', 
               fontWeight: '500', 
