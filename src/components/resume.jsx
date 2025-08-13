@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Bell, User, Menu, X, Upload, FileText, Briefcase, Target, Sparkles, Download, Check, ArrowRight, Star, Zap } from 'lucide-react';
 
 const ResumeBuilderPage = () => {
+  const navigate = useNavigate();
   const [isLoaded, setIsLoaded] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -65,24 +66,37 @@ const ResumeBuilderPage = () => {
     }
   };
 
-  const handleBuildResume = () => {
+  const handleBuildResume = async () => {
     if (!jobRole.trim()) {
-      alert('Please enter the job role you\'re applying for.');
-      return;
-    }
-    
-    if (resumeSource === 'upload' && !uploadedFile) {
-      alert('Please upload your resume or select "Use from Profile".');
-      return;
-    }
-    
+    alert('Please enter the job role you\'re applying for.');
+    return;
+  }
+
+  if (resumeSource === 'upload' && !uploadedFile) {
+    alert('Please upload your resume.');
+    return;
+  }
+
+  const formData = new FormData();
+  formData.append('resume', uploadedFile);
+
+  try {
     setIsBuilding(true);
-    
-    // Simulate building process
-    setTimeout(() => {
-      setIsBuilding(false);
-      alert('Resume built successfully! Your optimized resume is ready for download.');
-    }, 3000);
+    const res = await axios.post('http://localhost:5000/api/parse-resume', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    });
+
+    // console.log('Extracted Resume Data:', res.data);
+    // alert('Resume parsed successfully! Check console for details.');
+
+    navigate("/resume-analysis", { state: { parsedData: res.data } });
+
+  } catch (error) {
+    console.error(error);
+    alert('Failed to parse resume.');
+  } finally {
+    setIsBuilding(false);
+  }
   };
 
   const popularRoles = [

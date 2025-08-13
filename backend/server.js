@@ -8,6 +8,7 @@ const userRoutes = require('./routes/userRoutes');
 const profileRoutes = require('./routes/profileRoutes');
 const extendedProfileRoutes = require('./routes/extendedProfileRoutes');
 const applicationRoutes = require('./routes/applicationRoutes');
+const resumeParsing = require('./routes/resumeParser');
 
 dotenv.config();
 
@@ -30,6 +31,7 @@ app.use('/api/users', userRoutes);
 app.use('/api/profile', profileRoutes);
 app.use('/api/extended-profile', extendedProfileRoutes);
 app.use('/api/application', applicationRoutes);
+app.use('/api/parse-resume', resumeParsing);
 
 app.get('/', (req, res) => {
   res.send('ApplySmart Backend API is running!');

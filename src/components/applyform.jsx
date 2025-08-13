@@ -62,7 +62,7 @@ const ApplyForm = () => {
     setMessage('Submitting application...'); // Provide feedback to the user
     try {
       // Send the formData to your new backend API endpoint
-      const response = await axios.post('https://localhost:5000/api/application/submit', formData, {
+      const response = await axios.post('http://localhost:5000/api/application/submit', formData, {
         headers: {
           'Content-Type': 'application/json',
         },

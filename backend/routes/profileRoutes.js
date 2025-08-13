@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const multer = require('multer'); // Import multer for error handling
 const authenticateToken = require('../middleware/auth'); // Your existing auth middleware
 const upload = require('../middleware/cloudinaryUpload'); // Your existing Cloudinary upload middleware
 const Profile = require('../models/Profile'); // The consolidated Profile model
